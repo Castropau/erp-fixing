@@ -6,8 +6,19 @@ interface Location{
   location: string,
 
 }
+
+interface Category{
+    id: number,
+    category: string,
+}
+
+interface Item{
+    id: number,
+    item_no: string,
+}
 export interface FetchInventoryId {
     id: number,
+    item_reference: Item,
    description: string,
    brand: string,
    serial: string,
@@ -16,9 +27,10 @@ export interface FetchInventoryId {
    quantity: number,
    unit_of_measurement: string,
    srp: number,
-   category: string,
+   category: Category,
    location: Location,
    photos: string,
+   item_no: string,
 
     
 }

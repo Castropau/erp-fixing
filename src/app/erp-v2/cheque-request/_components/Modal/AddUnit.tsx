@@ -64,12 +64,12 @@ export default function AddUnit() {
 
   return (
     <>
-      <div className="flex justify-start mb-4">
+      <div className="flex justify-start mb-4 up">
         <button
-          className="btn btn-info"
+          className="btn bg-white border border-black uppercase text-black"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaCirclePlus className="w-6 h-6 btn-info" />
+          {/* <FaCirclePlus className="w-6 h-6 btn-info" /> */}
           Add Unit
         </button>
       </div>

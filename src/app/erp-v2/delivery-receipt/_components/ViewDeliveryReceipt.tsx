@@ -67,7 +67,7 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
   });
 
   const { data: SalesmanData } = useQuery({
-    queryKey: ["released"],
+    queryKey: ["salesman"],
     queryFn: fetchSalesmanBy, // Assume fetchDepartmentsList is an API call to fetch departments (projects)
   });
   const { data: ReleasedData } = useQuery({
@@ -75,7 +75,7 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
     queryFn: fetchReleasedBy, // Assume fetchDepartmentsList is an API call to fetch departments (projects)
   });
   const { data: ApprovedData } = useQuery({
-    queryKey: ["released"],
+    queryKey: ["approve"],
     queryFn: fetchApprovedBy, // Assume fetchDepartmentsList is an API call to fetch departments (projects)
   });
   // Fetch project data based on dropdown selection
@@ -105,15 +105,26 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
     const newRows = rows.filter((_, i) => i !== index);
     setRows(newRows);
   };
+  if (Rloading) {
+    return (
+      <div className="flex justify-center items-center space-x-2">
+        {/* Spinner */}
+        <div className="w-6 h-6 border-4 border-dashed border-gray-400 border-t-transparent rounded-full animate-spin dark:border-gray-200 dark:border-t-transparent"></div>
 
+        <span className="text-sm text-gray-700 dark:text-gray-300">
+          Loading...
+        </span>
+      </div>
+    );
+  }
   return (
     <>
       <div className="flex justify-start">
         <button
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow transition duration-200"
+          className="uppercase flex items-center gap-2 bg-white  text-blue-800 border border-blue-800 px-4 py-2 rounded-md shadow transition duration-200"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaEye className="w-6 h-6 btn-info" />
+          {/* <FaEye className="w-6 h-6 btn-info" /> */}
           View
         </button>
       </div>
@@ -123,7 +134,9 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
         <dialog open className="modal mt-15 backdrop-blur-sm">
           <div className="modal-box w-11/12 max-w-7xl max-h-[80vh] overflow-y-auto dark:bg-gray-dark ">
             <div className="flex justify-between items-center">
-              <h3 className="font-bold text-lg">Warehouse Released</h3>
+              <h3 className="font-bold text-lg uppercase">
+                Warehouse Released
+              </h3>
               {/* Toggle between CiEdit and CiCircleBan based on editability */}
               {isEditable ? (
                 <FaBan
@@ -274,14 +287,14 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
                 ];
 
                 return (
-                  <Form className="py-4">
+                  <Form className="py-1">
                     {/* Warehouse Released Section */}
                     <div className="my-6">
                       {/* <h4 className="font-bold text-lg">Warehouse Released</h4> */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                         {warehouseReleasedFields.map((field) => (
                           <div key={field.name}>
-                            <label className="block mb-2 text-sm font-medium ">
+                            <label className="uppercase block mb-1 text-sm font-medium ">
                               {field.label}
                             </label>
                             {field.type === "select" ? (
@@ -321,11 +334,11 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
                     {/* "From" and "To" Sections with borders */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {/* "From" Section with Border */}
-                      <div className="space-y-6 border p-4 rounded-lg">
-                        <h4 className="font-bold text-lg">From</h4>
+                      <div className="space-y-1 border p-4 rounded-lg">
+                        <h4 className="font-bold text-lg uppercase">From</h4>
                         {fromFields.map((field) => (
                           <div key={field.name}>
-                            <label className="block mb-2 text-sm font-medium ">
+                            <label className="uppercase block mb-2 text-sm font-medium ">
                               {field.label}
                             </label>
                             {field.type === "select" ? (
@@ -364,11 +377,11 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
                       </div>
 
                       {/* "To" Section with Border */}
-                      <div className="space-y-6 border p-4 rounded-lg">
-                        <h4 className="font-bold text-lg">To</h4>
+                      <div className="space-y-1 border p-4 rounded-lg">
+                        <h4 className="font-bold text-lg uppercase">To</h4>
                         {toFields.map((field) => (
                           <div key={field.name}>
-                            <label className="block mb-2 text-sm font-medium ">
+                            <label className="uppercase block mb-2 text-sm font-medium ">
                               {field.label}
                             </label>
                             <Field
@@ -393,7 +406,7 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
                         {({ insert, remove, push }) => (
                           <>
                             {isEditable && (
-                              <div className="mb-4">
+                              <div className="mb-4 flex justify-start">
                                 <button
                                   type="button"
                                   onClick={() =>
@@ -406,16 +419,18 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
                                       ),
                                     })
                                   }
-                                  className="btn btn-info"
+                                  className="bg-white text-black border border-black px-4 py-2 rounded flex items-center space-x-2 uppercase"
+
+                                  // className="btn btn-info text-white uppercase"
                                 >
                                   Add Item
                                 </button>
                               </div>
                             )}
 
-                            <table className="min-w-full table-auto border-collapse border border-gray-300">
-                              <thead>
-                                <tr>
+                            <table className="min-w-full table-zebra border-collapse border border-black">
+                              <thead className="bg-gray-200">
+                                <tr className="uppercase ">
                                   <th className="border px-4 py-2">No.</th>
 
                                   <th className="border px-4 py-2">Quantity</th>
@@ -440,7 +455,7 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
                                         name={`items[${index}].quantity`}
                                         className={`w-full border p-2 ${
                                           !isEditable &&
-                                          "bg-gray-200 cursor-not-allowed dark:bg-gray-dark"
+                                          "bg-gray-100 cursor-not-allowed dark:bg-gray-dark"
                                         }`}
                                         disabled={!isEditable}
                                       />
@@ -452,20 +467,21 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
                                         name={`items[${index}].description`}
                                         className={`w-full border p-2 ${
                                           !isEditable &&
-                                          "bg-gray-200 cursor-not-allowed dark:bg-gray-dark"
+                                          "bg-gray-100 cursor-not-allowed dark:bg-gray-dark"
                                         }`}
                                         disabled={!isEditable}
                                       />
                                     </td>
 
                                     {isEditable && (
-                                      <td className="border px-4 py-2 text-center">
+                                      <td className="border px-4 py-2">
                                         <button
                                           type="button"
                                           onClick={() => remove(index)}
-                                          className="text-red-600 hover:text-red-800"
+                                          // className="text-red-600 hover:text-red-800"
+                                          className="items-center gap-1 bg-white border border-red-800 text-red-800 px-3 py-1.5 rounded-md text-xs shadow transition duration-200 uppercase"
                                         >
-                                          <FaTrash className="inline mr-1" />
+                                          {/* <FaTrash className="inline mr-1" /> */}
                                           Remove
                                         </button>
                                       </td>
@@ -478,18 +494,17 @@ export default function ViewDeliveryReceipt(props: DeliveryId) {
                         )}
                       </FieldArray>
 
-                      {isEditable && ( // Conditionally render Add Row button
+                      {/* {isEditable && (
                         <div className="flex justify-start mt-4">
                           <button
                             type="button"
                             onClick={handleAddRow}
-                            className="bg-blue-500 text-white px-4 py-2 rounded flex items-center space-x-2"
+                            className="bg-white text-black border border-black px-4 py-2 rounded flex items-center space-x-2 uppercase"
                           >
-                            <FaPlusCircle />
                             <span>Add Row</span>
                           </button>
                         </div>
-                      )}
+                      )} */}
                     </div>
 
                     {/* <div className="modal-action">

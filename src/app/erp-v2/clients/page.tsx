@@ -4,7 +4,7 @@ import Clients from "./Clients";
 
 function Page() {
   return (
-    <div className="p-4 sm:ml-64">
+    <div className="p-4">
       <Clients />
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 import { Formik, Form, Field } from "formik";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChequeItems } from "@/api/cheque-request/fetchItems";
 import { ChequeUnits } from "@/api/cheque-request/fetchUnits";
@@ -64,6 +64,7 @@ function View() {
 
     enabled: !!id,
   });
+
   const {
     isLoading: isUnitsLoading,
     error: UnitsError,
@@ -86,8 +87,38 @@ function View() {
     },
   });
 
-  const totalPagesItems = Math.ceil((itemsData?.length || 0) / rowsPerPage);
-  const totalPagesUnits = Math.ceil((unitsData?.length || 0) / rowsPerPage);
+  // const filteredQuotations = VendorData?.quotations.filter(
+  //   (q) =>
+  //     q.project_name
+  //       ?.toLowerCase()
+  //       .includes(searchTermLocation.toLowerCase()) ||
+  //     q.quotation_no?.toLowerCase().includes(searchTermLocation.toLowerCase())
+  // );
+
+  const newVendorData = VendorData?.quotations.filter((data) =>
+    Object.values(data).some(
+      (val) =>
+        typeof val == "string" &&
+        val
+          .toLocaleLowerCase()
+          .includes(searchTermLocation?.toLocaleLowerCase() || "")
+    )
+  );
+
+  const indexOfLastRowUnits = currentPageUnits * rowsPerPage;
+  const indexOfFirstRowUnits = indexOfLastRowUnits - rowsPerPage;
+  // const currentUnitsRows = filteredQuotations?.slice(
+  //   indexOfFirstRowUnits,
+  //   indexOfLastRowUnits
+  // );
+  const paginatedVendorData = newVendorData?.slice(
+    (currentPageUnits - 1) * rowsPerPage,
+    currentPageUnits * rowsPerPage
+  );
+
+  const totalPagesUnits = Math.ceil((newVendorData?.length || 0) / rowsPerPage);
+  // const totalPagesItems = Math.ceil((itemsData?.length || 0) / rowsPerPage);
+  // const totalPagesUnits = Math.ceil((unitsData?.length || 0) / rowsPerPage);
 
   const filteredItemsData = itemsData?.filter((item) =>
     item.item.toLowerCase().includes(searchTerm.toLowerCase())
@@ -98,29 +129,18 @@ function View() {
       .toLowerCase()
       .includes(searchTermLocation.toLowerCase())
   );
-
+  // const totalPagesUnits = Math.ceil(
+  //   (filteredUnitsData?.length || 0) / rowsPerPage
+  // );
   const indexOfLastRowItems = currentPageItems * rowsPerPage;
   const indexOfFirstRowItems = indexOfLastRowItems - rowsPerPage;
-  const currentItemsRows = filteredItemsData?.slice(
-    indexOfFirstRowItems,
-    indexOfLastRowItems
-  );
 
-  const indexOfLastRowUnits = currentPageUnits * rowsPerPage;
-  const indexOfFirstRowUnits = indexOfLastRowUnits - rowsPerPage;
-  const currentUnitsRows = filteredUnitsData?.slice(
-    indexOfFirstRowUnits,
-    indexOfLastRowUnits
-  );
-
-  const handlePrevItems = () => {
-    if (currentPageItems > 1) setCurrentPageItems(currentPageItems - 1);
-  };
-
-  const handleNextItems = () => {
-    if (currentPageItems < totalPagesItems)
-      setCurrentPageItems(currentPageItems + 1);
-  };
+  // const indexOfLastRowUnits = currentPageUnits * rowsPerPage;
+  // const indexOfFirstRowUnits = indexOfLastRowUnits - rowsPerPage;
+  // const currentUnitsRows = filteredUnitsData?.slice(
+  //   indexOfFirstRowUnits,
+  //   indexOfLastRowUnits
+  // );
 
   const handlePrevUnits = () => {
     if (currentPageUnits > 1) setCurrentPageUnits(currentPageUnits - 1);
@@ -131,89 +151,73 @@ function View() {
       setCurrentPageUnits(currentPageUnits + 1);
   };
 
-  // update item mutation
-  const { mutate: updatedItem } = useMutation({
-    mutationFn: (data: UpdateItems) => updateItems(data.id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["items"] });
-      setIsItemModalOpen(false);
-    },
-  });
+  if (isCLoading) {
+    return (
+      <div className="p-4 flex justify-center items-center min-h-screen">
+        <div className="flex flex-col items-center space-y-4">
+          {/* Loading Spinner */}
+          <div className="dark:border-gray-200 dark:border-t-white  w-16 h-16 border-4 border-t-4 border-gray-800 border-dashed rounded-full animate-spin"></div>
 
-  // update location mutation
-  const { mutate: updateLoc } = useMutation({
-    mutationFn: (data: UpdateLocation) => updateLocation(data.id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["units"] });
-      setIsLocationModalOpen(false);
-    },
-  });
+          <span className="text-lg text-gray-700 dark:text-white">
+            Please wait...
+          </span>
+        </div>
+      </div>
+    );
+  }
 
-  // delete item mutation
-  const { mutate: deleteItemMutation } = useMutation({
-    mutationFn: (id: number) => deleteItem(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["items"] });
-    },
-  });
-
-  // delete location mutation
-  const { mutate: deleteLocationMutation } = useMutation({
-    mutationFn: (id: number) => deleteLocation(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["units"] });
-    },
-  });
   return (
     <>
       <div className="ml-auto">
         <Link href="/erp-v2/clients">
-          <button className="btn btn-info">
-            <IoMdArrowBack />
+          <button className="btn bg-white border border-black text-black uppercase">
+            {/* <IoMdArrowBack /> */}
             Back to Clients
           </button>
         </Link>
       </div>
-      <div className="grid grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-2 gap-6"> */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column */}
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold flex justify-between items-center">
-            Personal Information
-            <div className="flex space-x-2">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold dark:text-white">
+              Personal Information
+            </h2>
+            <div className="flex gap-2">
               {!isEditable ? (
                 <button
                   onClick={handleEditToggle}
-                  className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+                  className="uppercase px-4 py-2 text-blue-800 bg-white rounded-lg  border border-blue-800"
                 >
-                  Edits
+                  Edit
                 </button>
               ) : (
                 <>
                   <button
                     onClick={handleCancel}
-                    className="px-4 py-2 text-white bg-gray-500 rounded-lg hover:bg-gray-600"
+                    className="px-4 py-2 text-gray-800 bg-white rounded-lg border border-gray-800 uppercase"
                   >
                     Cancel
-                  </button>
-                  <button
-                    onClick={handleEditToggle}
-                    className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600"
-                  >
-                    Update
                   </button>
                 </>
               )}
             </div>
-          </h2>
+          </div>
 
           {/* Profile Image */}
-          <div className="flex justify-center mb-4">
+          <div className="flex flex-col items-center">
             <img
               src="https://via.placeholder.com/100"
               alt="Profile"
               className="w-24 h-24 rounded-full border-2 border-gray-300"
             />
+            <span className=" text-lg text-center font-bold uppercase">
+              {VendorData?.client}
+            </span>
           </div>
 
+          {/* Formik Form */}
           <Formik
             initialValues={{
               client: VendorData?.client || "",
@@ -225,92 +229,128 @@ function View() {
             }}
             enableReinitialize={true}
             onSubmit={(values) => {
-              console.log(values);
-              updateClients(values); // Handle form submission by calling the mutation
+              updateClients(values);
             }}
           >
-            <Form className="space-y-6 md:space-y-8">
-              <div style={{ color: "red" }}>
-                {/* Display error messages here if needed */}
-              </div>
-
+            <Form className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Input Fields */}
               {[
                 {
                   type: "text",
                   name: "client",
                   placeholder: "Vendor",
-                  label: "client",
+                  label: "Client",
                 },
                 {
                   type: "text",
                   name: "address",
-                  placeholder: "Contact",
-                  label: "address",
+                  placeholder: "Enter address",
+                  label: "Address",
                 },
                 {
                   type: "text",
                   name: "contact_person",
-                  placeholder: "Enter email",
-                  label: "contact_person",
+                  placeholder: "Enter contact person",
+                  label: "Contact Person",
                 },
                 {
                   type: "text",
                   name: "position",
-                  placeholder: "Enter address",
-                  label: "position",
+                  placeholder: "Enter position",
+                  label: "Position",
                 },
                 {
                   type: "text",
                   name: "contact_number",
-                  placeholder: "Enter address",
-                  label: "contact_number",
+                  placeholder: "Enter contact number",
+                  label: "Contact Number",
                 },
-
                 {
                   type: "email",
                   name: "email",
-                  placeholder: "Enter description",
-                  label: "email",
+                  placeholder: "Enter email",
+                  label: "Email",
                 },
               ].map((item) => (
-                <div key={item.name} className="space-y-4">
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                <div key={item.name} className="flex flex-col space-y-1">
+                  <label
+                    htmlFor={item.name}
+                    className="uppercase text-sm font-semibold text-gray-700 dark:text-white"
+                  >
                     {item.label}
                   </label>
-                  {item.type === "select" ? (
-                    <Field
-                      as="select"
-                      name={item.name}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      disabled={!isEditable}
-                    >
-                      <option value="">Select {item.label}</option>
-                      {item.options?.map((option, index) => (
-                        <option key={index} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </Field>
-                  ) : (
-                    <Field
-                      type={item.type}
-                      id={item.name}
-                      name={item.name}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder={item.placeholder}
-                      readOnly={!isEditable} // Conditionally disable input based on isEditable state
-                    />
-                  )}
+                  <Field
+                    type={item.type}
+                    id={item.name}
+                    name={item.name}
+                    placeholder={item.placeholder}
+                    readOnly={!isEditable}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  />
                 </div>
               ))}
+              <div className="md:col-span-2">
+                <table className="min-w-full table-zebra border-collapse border border-black">
+                  <thead className="border border-black">
+                    <tr className="text-blue-500 uppercase bg-gray-200 ">
+                      <th className="p-2 text-center">created by</th>
+                      <th className="p-2 text-center">date created </th>
 
+                      {/* <th className="p-2 text-center">Actions</th> */}
+                    </tr>
+                  </thead>
+                  {/* <tbody>
+                  {VendorData?.quotations?.map((quotation) => (
+                    <tr key={quotation.id} className="border-b">
+                      <td className="p-2">{quotation.quotation_no}</td>
+                      <td className="p-2">{quotation.project_name}</td>
+                      <td className="p-2">
+                        <button
+                          //   onClick={() => handleViewQuotation(quotation.id)}
+                          className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+                        >
+                          View
+                        </button>
+                        <ViewQuo id={quotation.id} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody> */}
+                  <tbody>
+                    {VendorData?.quotations &&
+                    VendorData.quotations.length > 0 ? (
+                      VendorData.quotations.map((quotation) => (
+                        <tr key={quotation.id} className="border-b">
+                          <td className="p-2 text-center">
+                            {quotation.created_by}
+                          </td>
+                          <td className="p-2 text-center">
+                            {VendorData.date_created}
+                          </td>
+                          {/* <td className="p-2 flex justify-center items-center">
+                          <ViewQuo id={quotation.id} />
+                        </td> */}
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={3}
+                          className="p-4 text-center text-gray-500"
+                        >
+                          No records found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
               {/* Submit Button */}
               {isEditable && (
                 <div className="modal-action">
                   <button
                     type="submit"
-                    className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600"
+                    className="px-4 py-2 text-black bg-white uppercase border border-black rounded-lg hover:bg-green-600"
                   >
                     Update
                   </button>
@@ -321,7 +361,7 @@ function View() {
         </div>
 
         {/* Second Column: Table */}
-        <div className="bg-white p-4 rounded-lg shadow-md">
+        <div className="bg-white p-4 rounded-lg shadow-md dark:bg-gray-700 dark:text-white">
           {/* <AddUnit /> */}
           {isUnitsLoading ? (
             <div>Loading locations...</div>
@@ -337,31 +377,50 @@ function View() {
                   setCurrentPageUnits(1);
                 }}
               />
-              <table className="min-w-full table-auto border-collapse">
-                <thead>
-                  <tr className="text-blue-500">
-                    <th className="p-2 text-left">Quotation #</th>
-                    <th className="p-2 text-left">Product Name</th>
+              <table className="min-w-full table-zebra border-collapse border border-black">
+                <thead className="border border-black">
+                  <tr className="text-blue-500 uppercase bg-gray-200 ">
+                    <th className="p-2 text-center">Quotation #</th>
+                    <th className="p-2 text-center">Product Name</th>
 
-                    <th className="p-2 text-left">Actions</th>
+                    <th className="p-2 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
+                {/* <tbody>
                   {VendorData?.quotations?.map((quotation) => (
                     <tr key={quotation.id} className="border-b">
                       <td className="p-2">{quotation.quotation_no}</td>
                       <td className="p-2">{quotation.project_name}</td>
                       <td className="p-2">
-                        {/* <button
+                        <button
                           //   onClick={() => handleViewQuotation(quotation.id)}
                           className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
                         >
                           View
-                        </button> */}
+                        </button>
                         <ViewQuo id={quotation.id} />
                       </td>
                     </tr>
                   ))}
+                </tbody> */}
+                <tbody>
+                  {paginatedVendorData && paginatedVendorData.length > 0 ? (
+                    paginatedVendorData.map((unit) => (
+                      <tr key={unit.id} className="border-b">
+                        <td className="p-2 text-center">{unit.quotation_no}</td>
+                        <td className="p-2 text-center">{unit.project_name}</td>
+                        <td className="p-2 flex justify-center items-center">
+                          <ViewQuo id={unit.id} />
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={3} className="p-4 text-center text-gray-500">
+                        No records found.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
               <div className="flex justify-end items-center mt-4 gap-2">

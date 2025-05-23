@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 /**state */
 import React, { useState, useMemo } from "react";
 
@@ -17,6 +17,11 @@ import {
   PurchaseOrder,
 } from "@/api/purchase-order/fetchPurchase";
 import { FaTrash } from "react-icons/fa6";
+import { deletePurchases } from "@/api/delivery_receipt/deletePurchaseOrder";
+import SearchInput from "./_components/Search/SearchInput";
+import LoadingPage from "@/components/Loading/LoadingPage";
+import TablePurchase from "./_components/Table/TablePurchase";
+import ServerError from "@/components/Error/ServerError";
 
 /** components */
 
@@ -35,23 +40,43 @@ export default function PurchacaseOrder() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
+  const queryClient = useQueryClient();
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const { isLoading, error, data } = useQuery<PurchaseOrder[]>({
     queryKey: ["purchase"],
     queryFn: fetchPurchaseList,
+    // refetchInterval: 1000,
   });
+  const { mutate: deletePurchase } = useMutation({
+    mutationFn: (id: number) => deletePurchases(id),
+    onSuccess: () => {
+      console.log("Deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["cash"] });
+      setShowSuccess(true); // show alert
+      setTimeout(() => setShowSuccess(false), 3000);
+    },
+    onError: (error) => {
+      console.error("Error deleting cash:", error);
+    },
+  });
+  const filteredData =
+    data?.filter((item) =>
+      Object.values(item).some(
+        (val) =>
+          typeof val === "string" &&
+          val.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    ) ?? [];
 
-  const filteredData = useMemo(() => {
-    return data?.filter(
-      (user) =>
-        user.po_no.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.created_by.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.vendor.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [searchTerm, data]);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
   //   const totalPages = Math.ceil(filteredData!.length / rowsPerPage);
-  const totalPages = Math.ceil((filteredData?.length || 0) / rowsPerPage);
+  // const totalPages = Math.ceil((filteredData?.length || 0) / rowsPerPage);
 
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
@@ -68,173 +93,92 @@ export default function PurchacaseOrder() {
   function setShowRegisterModal(arg0: boolean): void {
     throw new Error("Function not implemented.");
   }
-  if (isLoading) {
-    return (
-      <div className="flex justify-center ">
-        <table className="table table-xs table-zebra w-full">
-          <tbody>
-            {[...Array(5)].map((_, index) => (
-              <tr
-                key={index}
-                className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
-              >
-                <td className="text-xs">
-                  <div className="skeleton w-16 h-4 bg-gray-300 rounded"></div>
-                </td>
-                <td className="text-xs">
-                  <div className="skeleton w-24 h-4 bg-gray-300 rounded"></div>
-                </td>
-                <td className="text-xs">
-                  <div className="skeleton w-20 h-4 bg-gray-300 rounded"></div>
-                </td>
-                <td className="text-xs">
-                  <div className="skeleton w-24 h-4 bg-gray-300 rounded"></div>
-                </td>
-                <td className="text-xs">
-                  <div className="skeleton w-20 h-4 bg-gray-300 rounded"></div>
-                </td>
-                <td className="text-xs">
-                  <div className="skeleton w-16 h-4 bg-gray-300 rounded"></div>
-                </td>
-                <td className="text-xs">
-                  <div className="skeleton w-24 h-4 bg-gray-300 rounded"></div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
+  if (isLoading) return <LoadingPage />;
 
-  if (error instanceof Error)
-    return <div>An error has occurred: {error.message}</div>;
+  // if (error instanceof Error)
+  //   return <div>An error has occurred: {error.message}</div>;
+  if (error instanceof Error) return <ServerError />;
 
   return (
-    <div className="p-6 bg-gray-400 rounded-lg shadow-md dark:bg-gray-dark">
-      {/* Search and Add */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        {/* Search */}
-        <label className="relative w-full max-w-sm">
-          {/* Search Input */}
-          <input
-            type="search"
-            className="dark:text-white w-full py-2 pl-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
+    <>
+      {showSuccess && (
+        <div
+          role="alert"
+          className="alert alert-success mb-4 flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-md transition-opacity duration-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 shrink-0 stroke-current"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>purchase successfully deleted.</span>
+        </div>
+      )}
+      <div className=" bg-white rounded-lg  dark:bg-gray-dark">
+        {/* Search and Add */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-1">
+          {/* Search */}
+          <SearchInput
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            setCurrentPage={setCurrentPage}
           />
 
-          {/* Search Icon (left) */}
-          <svg
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="20"
-            height="20"
-          >
-            <g
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              strokeWidth="2.5"
-              fill="none"
-              stroke="currentColor"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </g>
-          </svg>
-        </label>
+          {/* Add PO */}
+          <div className="ml-auto">
+            <AddPurchaseOrder />
+          </div>
+        </div>
 
-        {/* Add PO */}
-        <div className="ml-auto">
-          <AddPurchaseOrder />
+        {/* Header */}
+        <h1 className="text-2xl font-semibold text-gray-800 mb-1 uppercase tracking-wide dark:text-white">
+          Purchase Orders
+        </h1>
+
+        {/* Table */}
+        <TablePurchase
+          data={paginatedData}
+          columns={[]}
+          currentPage={0}
+          rowsPerPage={0}
+          onView={function (id: number): void {
+            throw new Error("Function not implemented.");
+          }}
+          onDelete={function (id: number): void {
+            throw new Error("Function not implemented.");
+          }}
+          redirectingId={null}
+        />
+
+        {/* Pagination */}
+        <div className="flex justify-end items-center gap-3 mt-6 text-sm">
+          <button
+            onClick={handlePrev}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-gray-700 text-white rounded-md disabled:bg-gray-500 hover:bg-maroon-800 transition"
+          >
+            Previous
+          </button>
+          <span className="text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-gray-700 text-white rounded-md disabled:bg-gray-500 hover:bg-maroon-800 transition"
+          >
+            Next
+          </button>
         </div>
       </div>
-
-      {/* Header */}
-      <h1 className="text-2xl font-semibold text-gray-800 mb-4 uppercase tracking-wide dark:text-white">
-        Purchase Orders
-      </h1>
-
-      {/* Table */}
-      <div className="overflow-auto border border-gray-700 rounded-md shadow-sm">
-        <table className="min-w-full text-sm bg-white">
-          <thead className="bg-gray-700 text-white">
-            <tr>
-              <th className="px-4 py-2 text-left">PO No.</th>
-              <th className="px-4 py-2 text-left">To</th>
-              <th className="px-4 py-2 text-left">Grand Total</th>
-              <th className="px-4 py-2 text-left">Created By</th>
-              <th className="px-4 py-2 text-left">Date Created</th>
-              <th className="px-4 py-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData?.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="text-center text-gray-500 py-4 dark:bg-gray-dark dark:text-white"
-                >
-                  No records found
-                </td>
-              </tr>
-            ) : (
-              currentRows?.map((user, index) => (
-                <tr
-                  key={user.id}
-                  className={`transition-colors duration-300 ease-in-out
-    ${
-      index % 2 === 0
-        ? "bg-gray-50 dark:bg-gray-800"
-        : "bg-white dark:bg-gray-900"
-    }
-    text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700`}
-                >
-                  <td className="px-4 py-2">{user.po_no}</td>
-                  <td className="px-4 py-2">{user.vendor}</td>
-                  <td className="px-4 py-2">
-                    ₱ {user.grand_total.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2">{user.created_by}</td>
-                  <td className="px-4 py-2">{user.date_created}</td>
-                  <td className="px-4 py-2 flex gap-2">
-                    <ViewPurchase id={user.id} />
-                    <button className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs shadow transition duration-200">
-                      <FaTrash /> Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-end items-center gap-3 mt-6 text-sm">
-        <button
-          onClick={handlePrev}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-700 text-white rounded-md disabled:bg-gray-500 hover:bg-maroon-800 transition"
-        >
-          Previous
-        </button>
-        <span className="text-gray-700">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-700 text-white rounded-md disabled:bg-gray-500 hover:bg-maroon-800 transition"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    </>
   );
 }

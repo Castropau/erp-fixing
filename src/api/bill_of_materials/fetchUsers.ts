@@ -1,7 +1,7 @@
 /** server actions */
 import { getCookies } from "@/server/getToken";
 
-interface BomUser {
+export interface BomUser {
   id: number; // id as an integer
   full_name: string; // full_name as a string
   department: string; // department as a string

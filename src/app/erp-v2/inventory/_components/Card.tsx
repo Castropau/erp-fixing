@@ -6,6 +6,7 @@ import { IoGrid, IoGridOutline } from "react-icons/io5";
 import AddInventory from "./Modal/AddInventory";
 import Export from "./Modal/Export";
 import Link from "next/link";
+import ServerError from "@/components/Error/ServerError";
 
 const InventoryCard = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -87,8 +88,9 @@ const InventoryCard = () => {
       </div>
     );
 
-  if (error instanceof Error)
-    return <div>An error has occurred: {error.message}</div>;
+  // if (error instanceof Error)
+  //   return <div>An error has occurred: {error.message}</div>;
+  if (error instanceof Error) return <ServerError />;
 
   const toggleView = () => {
     setViewMode((prevMode) => (prevMode === "grid" ? "list" : "grid"));
@@ -216,22 +218,18 @@ const InventoryCard = () => {
       </div>
 
       <div className="overflow-auto rounded-lg shadow-lg border border-gray-600">
-        <table className="table table-xs w-full border-t rounded-lg shadow-lg bg-white text-sm">
-          <thead className="bg-gray-700 text-white">
-            <tr className="text-white-600 text-sm font-medium">
-              <th className="px-4 py-3 text-left text-sm font-semibold">
-                Item
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">
+        <table className="table-zebra w-full border-t rounded-lg shadow-lg bg-white">
+          <thead className="bg-gray-700 text-white uppercase">
+            <tr className="text-white-600 ">
+              <th className="px-4 py-3 text-center text-lg font-bold">Item</th>
+              <th className="px-4 py-3 text-center text-lg font-bold">
                 Category
               </th>
-              <th className="px-4 py-3 text-right text-sm font-semibold">
+              <th className="px-4 py-3 text-center text-lg font-bold">
                 Quantity
               </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold">
-                Unit
-              </th>
-              <th className="px-4 py-3 text-center text-sm font-semibold">
+              <th className="px-4 py-3 text-center text-lg font-bold">Unit</th>
+              <th className="px-4 py-3 text-center text-lg font-bold">
                 Actions
               </th>
             </tr>
@@ -251,29 +249,37 @@ const InventoryCard = () => {
                 <tr
                   key={inventory.id}
                   className={`transition-colors duration-300 ease-in-out
-    ${
-      index % 2 === 0
-        ? "bg-gray-50 dark:bg-gray-800"
-        : "bg-white dark:bg-gray-900"
-    }
-    text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700`}
+                ${
+                  index % 2 === 0
+                    ? "bg-gray-50 dark:bg-gray-800"
+                    : "bg-white dark:bg-gray-900"
+                }
+                text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700`}
                 >
-                  <td className="px-4 py-3 text-xs">{inventory.item}</td>
-                  <td className="px-4 py-3 text-xs ">{inventory.category}</td>
-                  <td className="px-4 py-3 text-xs text-right ">
+                  <td className=" text-lg text-center">{inventory.item}</td>
+                  <td className=" text-lg text-center ">
+                    {inventory.category}
+                  </td>
+                  <td className=" text-lg text-center ">
                     {inventory.quantity}
                   </td>
-                  <td className="px-4 py-3 text-xs">
+                  <td className=" text-lg text-center">
                     {inventory.unit_of_measurement}
                   </td>
-                  <td className="px-4 py-3 text-xs text-center">
+                  <td className=" text-xs text-center">
                     <div className="inline-flex gap-2 justify-center">
                       <Link href={`/erp-v2/inventory/view/${inventory.id}`}>
-                        <button className="text-blue-600 hover:underline">
+                        <button
+                          // className="text-blue-600 hover:underline"
+                          className="mt-2 uppercase px-3 py-2 text-xs font-medium text-blue-500 bg-white border border-blue-500 rounded-md  transition flex items-center gap-2"
+                        >
                           View
                         </button>
                       </Link>
-                      <button className="text-red-600 hover:underline">
+                      <button
+                        // className="text-red-600 hover:underline"
+                        className="mt-2 uppercase flex items-center gap-1 bg-white  text-red-800 border border-red-800 px-3 py-1.5 rounded-md text-xs shadow transition duration-200"
+                      >
                         Delete
                       </button>
                     </div>
@@ -310,18 +316,21 @@ const InventoryCard = () => {
   return (
     <>
       <div>
-        <div className="flex justify-start mb-4 gap-2">
+        <div className="flex justify-start mb-1 gap-2">
           <AddInventory />
           <Export />
-          <button className="btn bg-blue-500 text-white" onClick={toggleView}>
+          <button
+            className="btn bg-white text-black border border-black"
+            onClick={toggleView}
+          >
             {viewMode === "grid" ? (
               <>
-                <IoGrid className="mr-2" />
+                {/* <IoGrid className="mr-2" /> */}
                 Switch to List View
               </>
             ) : (
               <>
-                <FaListAlt className="mr-2" />
+                {/* <FaListAlt className="mr-2" /> */}
                 Switch to Grid View
               </>
             )}

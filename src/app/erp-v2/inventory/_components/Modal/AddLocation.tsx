@@ -68,10 +68,10 @@ export default function AddLocation() {
     <>
       <div className="flex justify-start mb-4">
         <button
-          className="btn btn-info"
+          className="btn btn-info text-white uppercase"
           onClick={() => setShowRegisterModal(true)}
         >
-          <CiCirclePlus className="w-6 h-6 btn-info" />
+          {/* <CiCirclePlus className="w-6 h-6 btn-info" /> */}
           Add Location
         </button>
       </div>

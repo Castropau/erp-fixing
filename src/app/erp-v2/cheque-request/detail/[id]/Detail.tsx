@@ -25,6 +25,8 @@ import {
   RequisitionCashOptions,
 } from "@/api/cheque-request/fetchCashRequest";
 import { ChequeUpdate, updateCheque } from "@/api/cheque-request/updateCheque";
+import LoadingPage from "@/components/Loading/LoadingPage";
+import LoadingSpinner from "@/components/Loading/LoadingSpinner";
 
 interface PageProps {}
 
@@ -164,7 +166,7 @@ function Detail(props: PageProps) {
     });
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingSpinner />;
   if (error) return <div>{error}</div>;
 
   if (!cheque) return <div>No cheque found.</div>;
@@ -181,21 +183,21 @@ function Detail(props: PageProps) {
   };
 
   return (
-    <div className="p-4 sm:ml-64">
+    <div className="p-4">
       <div className="ml-auto">
         <Link href="/erp-v2/cheque-request">
-          <button className="btn btn-info">
-            <IoMdArrowBack />
+          <button className="btn bg-white text-black border border-black uppercase">
+            {/* <IoMdArrowBack /> */}
             Back to Cheque List
           </button>
         </Link>
       </div>
 
       {/* Formik Form */}
-      <div className="bg-gray-300 p-4 rounded-lg shadow-md dark:bg-gray-dark dark:text-white">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-2xl font-semibold mb-4 dark:bg-gray-dark dark:text-white">
-            Cheque Details
+      <div className="bg-white p-4 rounded-lg dark:bg-gray-dark dark:text-white">
+        <div className="flex justify-between items-center mb-1">
+          <h3 className="text-2xl font-semibold mb-1 dark:bg-gray-dark dark:text-white">
+            {cheque.serial_no}
           </h3>
           <div className="flex gap-4">
             <IoMdPrint className="cursor-pointer text-lg" title="Print" />
@@ -272,30 +274,33 @@ function Detail(props: PageProps) {
           }}
         >
           <Form>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 uppercase">
               {/* Form Fields for Cheque Details */}
-              <div className="space-y-4">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:bg-gray-dark dark:text-white">
-                  Serial#
-                </label>
-                <Field
-                  as="select"
-                  name="serial_no"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-dark dark:text-white"
-                  disabled={!isEditing} // Disable if not editing
-                >
-                  <option value="">Select Serial No</option>
-                  {[...cheque.cheque_requisition_items, ...rows].map((item) => (
-                    <option key={item.id} value={item.serial_no}>
-                      {item.serial_no}
-                    </option>
-                  ))}
-                </Field>
-              </div>
-
+              {isEditing && (
+                <div className="space-y-4">
+                  <label className="block mb-1 text-sm font-bold text-gray-900 dark:bg-gray-dark dark:text-white">
+                    Serial#
+                  </label>
+                  <Field
+                    as="select"
+                    name="serial_no"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-dark dark:text-white"
+                    // disabled={!isEditing}
+                  >
+                    <option value="">Select Serial No</option>
+                    {[...cheque.cheque_requisition_items, ...rows].map(
+                      (item) => (
+                        <option key={item.id} value={item.serial_no}>
+                          {item.serial_no}
+                        </option>
+                      )
+                    )}
+                  </Field>
+                </div>
+              )}
               {/* Requested By Field */}
-              <div className="space-y-4">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:bg-gray-dark dark:text-white">
+              <div className="space-y-1">
+                <label className="block mb-1 text-sm font-bold text-gray-900 dark:bg-gray-dark dark:text-white">
                   Requested By
                 </label>
                 {isEditing ? (
@@ -358,8 +363,8 @@ function Detail(props: PageProps) {
                   placeholder: "Organization Address",
                 },
               ].map((field) => (
-                <div key={field.name} className="space-y-4 ">
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:bg-gray-dark dark:text-white">
+                <div key={field.name} className="space-y-4 uppercase ">
+                  <label className="block mb-1 text-sm font-bold text-gray-900 dark:bg-gray-dark dark:text-white">
                     {field.label}
                   </label>
                   <Field
@@ -387,37 +392,45 @@ function Detail(props: PageProps) {
               </div>
 
               {/* Show the Update button only if in editing mode */}
-              {isEditing && (
+              {/* {isEditing && (
                 <button
                   type="submit"
                   className="w-full text-white bg-info focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg text-sm px-5 py-2.5 text-center mt-4 hover:shadow-lg transition-all duration-200 ease-in-out"
                 >
                   Update
                 </button>
-              )}
+              )} */}
             </div>
+            {isEditing && (
+              <button
+                type="submit"
+                className="uppercase text-black bg-white border border-black focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg text-sm px-5 py-2.5 text-center mt-4 hover:shadow-lg transition-all duration-200 ease-in-out"
+              >
+                Update
+              </button>
+            )}
           </Form>
         </Formik>
       </div>
 
       {/* Table to display cheque items */}
       {/* Table to display cheque items */}
-      <div className="bg-gray-200 p-4 rounded-lg shadow-md mt-6 dark:bg-gray-dark dark:text-white">
-        <table className="min-w-full table-auto border-collapse">
+      <div className="bg-white p-4 rounded-lg shadow-md mt-1 dark:bg-gray-dark dark:text-white">
+        <table className="min-w-full table-zebra border-collapse">
           <thead>
-            <tr className="text-blue-500">
-              <th className="p-2 text-left">Serial No</th>
-              <th className="p-2 text-left">Date of Purchase</th>
-              <th className="p-2 text-left">Description</th>
-              <th className="p-2 text-left">Amount</th>
-              <th className="p-2 text-left">Cheque Number</th>
-              <th className="p-2 text-left">Remark</th>
-              {isEditing && <th className="p-2 text-left">Action</th>}
+            <tr className="text-blue-500 uppercase border border-black bg-gray-200">
+              <th className="p-2 text-center">Serial No</th>
+              <th className="p-2 text-center">Date of Purchase</th>
+              <th className="p-2 text-center">Description</th>
+              <th className="p-2 text-center">Amount</th>
+              <th className="p-2 text-center">Cheque Number</th>
+              <th className="p-2 text-center">Remark</th>
+              {isEditing && <th className="p-2 text-center">Action</th>}
             </tr>
           </thead>
           <tbody>
             {cheque.cheque_requisition_items?.map((item) => (
-              <tr key={item.id}>
+              <tr key={item.id} className="text-center border border-black">
                 <td className="p-2">{item.serial_no}</td>
                 <td className="p-2">{item.date_of_purchase}</td>
                 <td className="p-2">{item.description}</td>
@@ -435,7 +448,8 @@ function Detail(props: PageProps) {
                 {isEditing && ( // Conditionally render Remove button
                   <td className="p-2">
                     <button
-                      className="text-red-500 hover:text-red-700"
+                      className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs shadow transition duration-200 uppercase"
+                      // className="text-red-500 hover:text-red-700"
                       onClick={() => handleRemoveRow(item.id)}
                     >
                       Remove

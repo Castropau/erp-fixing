@@ -13,7 +13,7 @@ export interface FetchClientId {
    created_by: string,
    date_created: string,
 
-   quotations: Quotations,
+   quotations: Quotations[],
    client: string,
    address: string,
    contact_person: string,

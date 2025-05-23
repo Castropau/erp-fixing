@@ -4,7 +4,7 @@ import View from "./View";
 
 function Page() {
   return (
-    <div className="pl-72 pr-6 pt-6">
+    <div className="p-4">
       <View />
     </div>
   );

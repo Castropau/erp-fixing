@@ -37,7 +37,7 @@ export default function Page() {
   const usersCount = uniqueUsers.size;
 
   return (
-    <div className="p-4 sm:ml-64">
+    <div className="p-4">
       <View />
     </div>
   );

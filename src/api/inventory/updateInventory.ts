@@ -24,7 +24,7 @@ export interface UpdateInventory {
 
 export async function updateInventory(id: number, viewData: UpdateInventory ): Promise<UpdateInventory> {
   const token = await getCookies("token");
-  const response = await fetch(`http://192.168.0.249:8001/api/v1/clients/${id}/`, {
+  const response = await fetch(`http://192.168.0.249:8001/api/v1/inventories/${id}/`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token?.value}`,

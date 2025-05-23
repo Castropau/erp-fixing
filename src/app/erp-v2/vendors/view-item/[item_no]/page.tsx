@@ -3,7 +3,7 @@ import ViewItem from "./ViewItem";
 
 function Page() {
   return (
-    <div className="pl-72 pr-6 pt-6">
+    <div className="">
       <ViewItem />
     </div>
   );

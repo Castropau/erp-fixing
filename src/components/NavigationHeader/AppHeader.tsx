@@ -5,14 +5,24 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef } from "react";
 import { ThemeToggleButton } from "./ThemeToggleButton";
+import UserDropdown from "./UserDropdown";
 
 const AppHeader: React.FC = () => {
   const { toggleSidebar, isCollapsed } = useSidebar(); // Get the toggle function and collapse state
 
   return (
-    <header className="sticky top-0 flex w-full bg-[#2e2e2e] border-gray-900 z-99999 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
+    // <header className="sticky top-0 flex w-full bg-[#2e2e2e] border-gray-900 z-99999 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
+    <header className="sticky top-0 z-50 flex items-center justify-between w-full border-b bg-[#2e2e2e] px-4 py-1 dark:border-gray-800 dark:bg-gray-900 lg:px-6">
       <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
         <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
+          <Image
+            title="Logo"
+            width={44}
+            height={44}
+            src="/images/logo.png"
+            alt="Logo"
+          />
+
           <button
             className="items-center justify-center w-10 h-10 text-gray-500 border-gray-200 rounded-lg z-99999 dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border"
             onClick={toggleSidebar} // Use the toggle function here
@@ -55,16 +65,10 @@ const AppHeader: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 2xsm:gap-3">
-        {/* <!-- Dark Mode Toggler --> */}
+      <div className="flex items-center gap-3">
         <ThemeToggleButton />
-        {/* <!-- Dark Mode Toggler --> */}
-
-        {/* <NotificationDropdown /> */}
-        {/* <!-- Notification Menu Area --> */}
+        <UserDropdown />
       </div>
-      {/* <!-- User Area --> */}
-      {/* <UserDropdown /> */}
     </header>
   );
 };

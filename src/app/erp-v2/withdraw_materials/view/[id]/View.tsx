@@ -173,13 +173,13 @@ function View() {
     <>
       <h3 className="font-bold">Withdraw Materials</h3>
       <Link href="/erp-v2/withdraw_materials">
-        <button className="btn btn-info">
-          <FaArrowLeft />
+        <button className="btn btn-info text-white uppercase">
+          {/* <FaArrowLeft /> */}
           back
         </button>
       </Link>
       <div className="p-6 bg-gray-50 dark:bg-gray-dark dark:text-white">
-        <h2 className="text-xl font-bold mb-6">{WithdrawData?.serial_no}</h2>
+        <h2 className="text-xl font-bold mb-1">{WithdrawData?.serial_no}</h2>
 
         {/* Edit/Cancel Icon */}
         <button
@@ -219,7 +219,7 @@ function View() {
           }}
         >
           <Form>
-            <div className="mb-4 flex gap-4">
+            <div className="mb-1 flex gap-4">
               {/* Name of Requestor */}
               <div className="w-1/3">
                 <label className="block text-sm font-medium">
@@ -293,43 +293,49 @@ function View() {
 
             {/* Display Selected Rows */}
             <div className="mb-4">
-              <h3 className="font-medium mb-2">Selected Items:</h3>
+              <h3 className="font-bold uppercase mb-2">Selected Items:</h3>
               <div className="overflow-y-auto max-h-64 border rounded-md">
                 <table className="min-w-full border-collapse table-auto">
-                  <thead className="sticky top-0 bg-gray-100">
+                  <thead className="sticky top-0 bg-gray-400">
                     <tr>
-                      <th className="border px-4 py-2">ID</th>
-                      <th className="border px-4 py-2">Name</th>
-                      <th className="border px-4 py-2">Quantity</th>
-                      <th className="border px-4 py-2">Unit</th>
-                      <th className="border px-4 py-2">Specification</th>
-                      <th className="border px-4 py-2">Description</th>
+                      <th className="border px-4 py-2 uppercase">ID</th>
+                      <th className="border px-4 py-2 uppercase">Name</th>
+                      <th className="border px-4 py-2 uppercase">Quantity</th>
+                      <th className="border px-4 py-2 uppercase">Unit</th>
+                      <th className="border px-4 py-2 uppercase">
+                        Specification
+                      </th>
+                      <th className="border px-4 py-2 uppercase">
+                        Description
+                      </th>
                       {isEditing && (
-                        <th className="border px-4 py-2">Action</th>
+                        <th className="border px-4 py-2 uppercase">Action</th>
                       )}
                     </tr>
                   </thead>
                   <tbody>
                     {selectedRows.map((item, index) => (
                       <tr key={index}>
-                        <td className="border px-4 py-2">
+                        <td className="border px-4 py-2 text-center">
                           {item.inventory_item.id}
                         </td>
-                        <td className="border px-4 py-2">
+                        <td className="border px-4 py-2 text-center">
                           {item.inventory_item.item}
                         </td>
-                        <td className="border px-4 py-2">{item.quantity}</td>
-                        <td className="border px-4 py-2">
+                        <td className="border px-4 py-2 text-center">
+                          {item.quantity}
+                        </td>
+                        <td className="border px-4 py-2 text-center">
                           {item.inventory_item.unit_of_measurement}
                         </td>
-                        <td className="border px-4 py-2">
+                        <td className="border px-4 py-2 text-center">
                           {item.inventory_item.specification}
                         </td>
-                        <td className="border px-4 py-2">
+                        <td className="border px-4 py-2 text-center">
                           {item.inventory_item.description}
                         </td>
                         {isEditing && (
-                          <td className="border px-4 py-2">
+                          <td className="border px-4 py-2 text-center">
                             <button
                               type="button"
                               onClick={() =>

@@ -69,14 +69,14 @@ function CreateMaterialRequest() {
     <>
       <h3 className="font-bold">Withdraw Materials</h3>
       <Link href="/erp-v2/withdraw_materials">
-        <button className="btn btn-info">
-          <FaArrowLeft />
+        <button className="btn bg-white border border-black uppercase text-black">
+          {/* <FaArrowLeft /> */}
           back
         </button>
       </Link>
 
       <div className="p-6 bg-gray-50 dark:bg-gray-dark dark:text-white">
-        <h2 className="text-xl font-bold mb-6">Create Material Request</h2>
+        <h2 className="text-xl font-bold mb-1">Create Material Request</h2>
 
         <Formik
           initialValues={{
@@ -113,9 +113,9 @@ function CreateMaterialRequest() {
 
             return (
               <Form>
-                <div className="mb-4 flex gap-4">
+                <div className="mb-1 flex gap-4 uppercase">
                   <div className="w-1/3">
-                    <label className="block text-sm font-medium ">
+                    <label className="block text-sm font-bold ">
                       Name of Requestor
                     </label>
                     <Field
@@ -135,7 +135,7 @@ function CreateMaterialRequest() {
                   </div>
 
                   <div className="w-1/3">
-                    <label className="block text-sm font-medium ">
+                    <label className="block text-sm font-bold ">
                       Date of Request
                     </label>
                     <Field
@@ -146,7 +146,7 @@ function CreateMaterialRequest() {
                   </div>
 
                   <div className="w-1/3">
-                    <label className="block text-sm font-medium ">
+                    <label className="block text-sm font-bold ">
                       Date Needed
                     </label>
                     <Field
@@ -157,8 +157,8 @@ function CreateMaterialRequest() {
                   </div>
                 </div>
 
-                <div className="mb-4">
-                  <label className="block text-sm font-medium ">Purpose</label>
+                <div className="mb-2">
+                  <label className="block text-sm font-bold ">Purpose</label>
                   <Field
                     type="text"
                     name="purpose"
@@ -166,20 +166,20 @@ function CreateMaterialRequest() {
                   />
                 </div>
 
-                <div className="mb-4">
+                <div className="mb-2">
                   <button
                     type="button"
                     onClick={toggleModal}
-                    className="w-full bg-blue-500 text-white py-2 rounded-md"
+                    className=" bg-white uppercase border border-blue-800 text-blue-800 py-2 rounded-md pr-3 pl-4"
                   >
                     Select Items
                   </button>
                 </div>
 
-                <div className="mb-4">
-                  <h3 className="font-medium">Selected Items:</h3>
+                <div className="mb-2">
+                  <h3 className="font-bold uppercase">Selected Items:</h3>
                   <table className="min-w-full border-collapse table-auto">
-                    <thead>
+                    <thead className="uppercase">
                       <tr>
                         <th className="border px-4 py-2">ID</th>
                         <th className="border px-4 py-2">Name</th>
@@ -193,17 +193,25 @@ function CreateMaterialRequest() {
                     <tbody>
                       {values.material_items.map((row, index) => (
                         <tr key={index}>
-                          <td className="border px-4 py-2">{row.id}</td>
-                          <td className="border px-4 py-2">{row.item}</td>
-                          <td className="border px-4 py-2">{row.quantity}</td>
-                          <td className="border px-4 py-2">{row.unit}</td>
-                          <td className="border px-4 py-2">
+                          <td className="border px-4 py-2 text-center">
+                            {row.id}
+                          </td>
+                          <td className="border px-4 py-2 text-center">
+                            {row.item}
+                          </td>
+                          <td className="border px-4 py-2 text-center">
+                            {row.quantity}
+                          </td>
+                          <td className="border px-4 py-2 text-center">
+                            {row.unit_of_measurement}
+                          </td>
+                          <td className="border px-4 py-2 text-center">
                             {row.specification}
                           </td>
-                          <td className="border px-4 py-2">
+                          <td className="border px-4 py-2 text-center">
                             {row.description}
                           </td>
-                          <td className="border px-4 py-2">
+                          <td className="border px-4 py-2 text-center">
                             <button
                               type="button"
                               onClick={() =>
@@ -214,7 +222,7 @@ function CreateMaterialRequest() {
                                   )
                                 )
                               }
-                              className="bg-red-500 text-white py-1 px-2 rounded-md"
+                              className="bg-white text-red-800 border border-red-800 uppercase py-1 px-2 rounded-md"
                             >
                               Remove
                             </button>
@@ -227,14 +235,14 @@ function CreateMaterialRequest() {
 
                 <div className="flex gap-4">
                   <Link
-                    className="w-full bg-blue-500 text-white text-center py-2 rounded-md"
+                    className="pr-4 pl-4 uppercase bg-white text-blue-800 border border-blue-800 text-center py-2 rounded-md"
                     href="/erp-v2/withdraw_materials"
                   >
                     Cancel
                   </Link>
                   <button
                     type="submit"
-                    className="w-full bg-blue-500 text-white py-2 rounded-md"
+                    className="pr-4 pl-4 uppercase bg-white border border-black text-black py-2 rounded-md"
                   >
                     Submit
                   </button>
@@ -263,7 +271,7 @@ function CreateMaterialRequest() {
                       ) : (
                         <div className="max-h-[400px] overflow-y-auto">
                           <table className="min-w-full border-collapse table-auto">
-                            <thead>
+                            <thead className="uppercase">
                               <tr>
                                 <th className="border px-4 py-2">ID</th>
                                 <th className="border px-4 py-2">Name</th>
@@ -292,25 +300,25 @@ function CreateMaterialRequest() {
                                 )
                                 .map((row) => (
                                   <tr key={row.id}>
-                                    <td className="border px-4 py-2">
+                                    <td className="border px-4 py-2 text-center">
                                       {row.id}
                                     </td>
-                                    <td className="border px-4 py-2">
+                                    <td className="border px-4 py-2 text-center">
                                       {row.item}
                                     </td>
-                                    <td className="border px-4 py-2">
+                                    <td className="border px-4 py-2 text-center">
                                       {row.quantity}
                                     </td>
-                                    <td className="border px-4 py-2">
+                                    <td className="border px-4 py-2 text-center">
                                       {row.unit_of_measurement}
                                     </td>
-                                    <td className="border px-4 py-2">
+                                    <td className="border px-4 py-2 text-center">
                                       {row.specification}
                                     </td>
-                                    <td className="border px-4 py-2">
+                                    <td className="border px-4 py-2 text-center">
                                       {row.description}
                                     </td>
-                                    <td className="border px-4 py-2">
+                                    <td className="border px-4 py-2 text-center">
                                       <button
                                         type="button"
                                         onClick={() => handleSelectRow(row)}

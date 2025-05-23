@@ -8,11 +8,12 @@ interface Items{
     brand: string,
     vendor: string,
     created_by: string,
+    item: string,
 
 }
 export interface FetchVendorId {
     id: number,
-   items: Items,
+   items: Items[],
    country: string,
    created_by: string,
    date_created: string,
@@ -24,6 +25,8 @@ export interface FetchVendorId {
    tin: string,
    bank_details: string,
    description: string,
+   
+  //  length: number,
 
     
 }

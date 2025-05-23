@@ -45,7 +45,7 @@ export default function Config() {
     <>
       <div className="flex justify-end">
         <button
-          className="btn btn-info"
+          className="btn bg-white border border-black text-black uppercase mr-4"
           onClick={() => setShowRegisterModal(true)}
         >
           Config
@@ -84,7 +84,7 @@ export default function Config() {
                         label: "Terms & Conditions",
                       },
                     ].map((item) => (
-                      <div key={item.name} className="mb-4 col-span-2 ">
+                      <div key={item.name} className="mb-1 col-span-2 ">
                         <label
                           htmlFor={item.name}
                           className="block text-sm font-medium text-gray-700 dark:bg-gray-dark dark:text-white"
@@ -100,7 +100,7 @@ export default function Config() {
                             id={item.name}
                             name={item.name}
                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                            placeholder={item.placeholder}
+                            // placeholder={item.placeholder}
                           />
                         ) : null}
                       </div>

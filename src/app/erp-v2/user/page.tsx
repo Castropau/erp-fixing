@@ -12,6 +12,7 @@ import CreateUser from "./_components/Modal/CreateUser";
 import Card from "./_components/Card/card";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { FaBuilding, FaUsers } from "react-icons/fa6";
+import ServerError from "@/components/Error/ServerError";
 
 export default function Page() {
   const { isLoading, error, data } = useQuery({
@@ -39,8 +40,7 @@ export default function Page() {
     );
   }
 
-  if (error instanceof Error)
-    return <div>An error has occurred: {error.message}</div>;
+  if (error instanceof Error) return <ServerError />;
 
   const uniqueDepartments = new Set(data?.map((user) => user.department));
   const departmentCount = uniqueDepartments.size;
@@ -52,29 +52,34 @@ export default function Page() {
   const usersCount = uniqueUsers.size;
 
   return (
-    <div className="p-4 sm:ml-64">
-      <div className="grid grid-cols-3 gap-3 mb-5">
-        <Card
-          title={`Total of ${usersCount} Users`}
-          name="Users"
-          color="blue-500"
-          icon={<FaUsers size="1.5em" />}
-        />
-        <Card
-          title={`Total of ${departmentCount} Departments`}
-          color="red-500"
-          name="Departments"
-          icon={<FaBuilding size="1.5em" />}
-        />
-        <Card
-          title={`Total of ${roleCount} Roles`}
-          name="Roles"
-          color="green-500"
-          icon={<MdAdminPanelSettings size="1.5em" />}
-        />
+    <div className="p-4">
+      <div>
+        <div className="grid grid-cols-3 gap-3 mb-5 mt-5">
+          <Card
+            title={`Total of ${usersCount} Users`}
+            name="Users"
+            color="white"
+            border="black"
+            icon={<FaUsers size="1.5em" />}
+          />
+          <Card
+            title={`Total of ${departmentCount} Departments`}
+            color="white"
+            border="black"
+            name="Departments"
+            icon={<FaBuilding size="1.5em" />}
+          />
+          <Card
+            title={`Total of ${roleCount} Roles`}
+            name="Roles"
+            color="white"
+            border="black"
+            icon={<MdAdminPanelSettings size="1.5em" />}
+          />
+        </div>
+        <div className="overflow-x-auto">{/* <CreateUser /> */}</div>
+        <UserList />
       </div>
-      <div className="overflow-x-auto">{/* <CreateUser /> */}</div>
-      <UserList />
     </div>
   );
 }

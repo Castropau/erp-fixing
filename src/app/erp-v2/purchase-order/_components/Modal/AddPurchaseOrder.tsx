@@ -73,10 +73,10 @@ export default function AddPurchaseOrder() {
     <>
       <div className="flex justify-start">
         <button
-          className="btn btn-info"
+          className="btn bg-white border border-black  uppercase text-black mr-4"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaCirclePlus className="w-6 h-6 btn-info" />
+          {/* <FaCirclePlus className="w-6 h-6 btn-info" /> */}
           Add Purchase Order
         </button>
       </div>
@@ -85,7 +85,9 @@ export default function AddPurchaseOrder() {
       {showRegisterModal && (
         <dialog open className="modal mt-15 backdrop-blur-sm">
           <div className="modal-box w-11/12 max-w-7xl max-h-[80vh] overflow-y-auto dark:bg-gray-dark dark:text-white">
-            <h3 className="font-bold text-lg">Create New Purchase Order</h3>
+            <h3 className="font-bold text-lg uppercase">
+              Create New Purchase Order
+            </h3>
             <Formik
               initialValues={{
                 project: "",
@@ -144,10 +146,10 @@ export default function AddPurchaseOrder() {
                 );
 
                 return (
-                  <Form className="py-4">
+                  <Form className="py-1">
                     {/* Dropdown for Project Selection */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium">
+                    <div className="mb-1">
+                      <label className="block text-sm font-bold uppercase ">
                         Company
                       </label>
                       <Field
@@ -191,9 +193,9 @@ export default function AddPurchaseOrder() {
 
                     {/* Project Details */}
                     {selectedProject && (
-                      <div className="space-y-4">
+                      <div className="space-y-1">
                         <h4 className="font-semibold">Project Details</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                           {[
                             {
                               label: "Address",
@@ -247,7 +249,7 @@ export default function AddPurchaseOrder() {
                       </div>
                     )}
                     {/* Terms & Conditions */}
-                    <div className="mt-6">
+                    <div className="mt-1 mb-2">
                       <h4 className="font-semibold">Terms & Conditions</h4>
                       <Field
                         as="textarea"
@@ -258,13 +260,13 @@ export default function AddPurchaseOrder() {
                     </div>
 
                     {/* Table for Adding Expenses */}
-                    <div className="space-y-4">
-                      <h4 className="font-semibold">Expenses</h4>
+                    <div className="space-y-1">
+                      {/* <h4 className="font-semibold">Expenses</h4> */}
                       <FieldArray
                         name="tableRows"
                         render={(arrayHelpers) => (
                           <div>
-                            <table className="table-auto w-full border-collapse">
+                            <table className="table-zebra w-full border-collapse">
                               <thead>
                                 <tr>
                                   {[
@@ -274,7 +276,10 @@ export default function AddPurchaseOrder() {
                                     "Quantity",
                                     "Total",
                                   ].map((header) => (
-                                    <th key={header} className="p-2 text-left">
+                                    <th
+                                      key={header}
+                                      className="p-2 text-center border border-black bg-gray-200"
+                                    >
                                       {header}
                                     </th>
                                   ))}
@@ -283,21 +288,21 @@ export default function AddPurchaseOrder() {
                               <tbody>
                                 {values.tableRows.map((row, index) => (
                                   <tr key={index}>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="text"
                                         name={`tableRows[${index}].item`}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-dark dark:text-white"
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="text"
                                         name={`tableRows[${index}].description`}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-dark dark:text-white"
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`tableRows[${index}].srp`}
@@ -323,7 +328,7 @@ export default function AddPurchaseOrder() {
                                         }}
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`tableRows[${index}].quantity`}
@@ -349,7 +354,7 @@ export default function AddPurchaseOrder() {
                                         }}
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`tableRows[${index}].total`}
@@ -363,7 +368,8 @@ export default function AddPurchaseOrder() {
                                         onClick={() =>
                                           arrayHelpers.remove(index)
                                         }
-                                        className="btn btn-danger"
+                                        // className="btn btn-danger"
+                                        className="flex items-center gap-1 bg-white  text-red-800 border border-red-800 px-3 py-1.5 rounded-md text-xs shadow transition duration-200 uppercase"
                                       >
                                         Remove
                                       </button>
@@ -383,7 +389,7 @@ export default function AddPurchaseOrder() {
                                   total: 0,
                                 })
                               }
-                              className="btn btn-info mt-4"
+                              className="btn bg-white text-black border border-black mt-2 uppercase mb-2"
                             >
                               Add Row
                             </button>
@@ -447,13 +453,6 @@ export default function AddPurchaseOrder() {
                             className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-white"
                           />
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Grand Total */}
-                    <div className="flex justify-between py-2 border-t border-gray-300">
-                      <div className="ml-auto flex space-x-4 w-full">
-                        {/* Grand Total */}
                         <div className="flex flex-col w-1/4">
                           <label className="font-semibold">Grand Total</label>
                           <input
@@ -469,6 +468,28 @@ export default function AddPurchaseOrder() {
                             className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-white"
                           />
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Grand Total */}
+                    <div className="flex justify-between py-2 border-t border-gray-300">
+                      <div className="ml-auto flex space-x-4 w-full">
+                        {/* Grand Total */}
+                        {/* <div className="flex flex-col w-1/4">
+                          <label className="font-semibold">Grand Total</label>
+                          <input
+                            type="number"
+                            value={(() => {
+                              const discountAmount =
+                                totalExpenses * (values.discount / 100) || 0;
+                              const vatAmount =
+                                totalExpenses * (values.vat / 100) || 0;
+                              return totalExpenses - discountAmount + vatAmount;
+                            })()}
+                            readOnly
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-white"
+                          />
+                        </div> */}
                       </div>
                     </div>
 

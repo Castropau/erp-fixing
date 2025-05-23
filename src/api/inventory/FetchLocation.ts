@@ -11,7 +11,7 @@ export interface Location {
     location: string;
 }
 
-export async function FetchLocation(): Promise<Location[]> {
+export async function fetchingLocations(): Promise<Location[]> {
     const token = await getCookies("token");
     const response = await fetch(
       "http://192.168.0.249:8001/api/v1/inventories/location",

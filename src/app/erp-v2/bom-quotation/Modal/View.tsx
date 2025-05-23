@@ -95,15 +95,24 @@ export default function View(props: QuotationId) {
   const handleSubmit = (values: any) => {
     console.log(values);
   };
-
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center space-x-2">
+        <div className="w-6 h-6 border-4 border-dashed border-gray-400 border-t-transparent rounded-full animate-spin dark:border-gray-200 dark:border-t-transparent"></div>
+        <span className="text-sm text-gray-700 dark:text-gray-300">
+          Loading...
+        </span>
+      </div>
+    );
+  }
   return (
     <>
       <div className="flex justify-start">
         <button
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow transition duration-200"
+          className="text-blue-800 uppercase flex items-center gap-2 bg-white border border-blue-800   px-4 py-2 rounded-md shadow transition duration-200"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaEye className="w-6 h-6 btn-info" />
+          {/* <FaEye className="w-6 h-6 btn-info" /> */}
           View
         </button>
       </div>

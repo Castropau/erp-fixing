@@ -66,10 +66,10 @@ export default function AddClients() {
     <>
       <div className="flex justify-start">
         <button
-          className="btn btn-info"
+          className="btn bg-white border border-black text-black mr-4 uppercase"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaCirclePlus className="w-6 h-6 btn-info" />
+          {/* <FaCirclePlus className="w-6 h-6 btn-info" /> */}
           Add Clients
         </button>
       </div>
@@ -78,9 +78,9 @@ export default function AddClients() {
         {showRegisterModal && (
           <dialog open className="modal mt-15 backdrop-blur-sm">
             <div className="modal-box w-11/12 max-w-7xl max-h-[80vh] overflow-y-auto dark:bg-gray-dark dark:text-white">
-              <h3 className="font-bold text-lg">Create Client</h3>
+              {/* <h3 className="font-bold text-lg">Create Client</h3> */}
               <span className="font-bold">
-                Fill out this information below to create new vendor
+                Fill out this information below to create new client
               </span>
 
               {/* Error Message Display */}
@@ -101,8 +101,8 @@ export default function AddClients() {
                   console.log(values);
                 }}
               >
-                <Form className="py-4">
-                  <div className="grid grid-cols-1 gap-6">
+                <Form className="py-1">
+                  <div className="grid grid-cols-3 gap-3  uppercase">
                     {/* Category Field */}
                     {[
                       {
@@ -114,7 +114,7 @@ export default function AddClients() {
                       {
                         type: "text",
                         name: "address",
-                        placeholder: "Enter Company",
+                        placeholder: "Enter Company address",
                         label: "Company address",
                       },
                       {
@@ -143,7 +143,7 @@ export default function AddClients() {
                       },
                     ].map((item) => (
                       <div key={item.name} className="space-y-4">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        <label className=" block mb-2 text-sm font-bold text-gray-900 dark:text-white">
                           {item.label}
                         </label>
                         <Field

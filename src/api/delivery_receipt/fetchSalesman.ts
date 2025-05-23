@@ -14,7 +14,7 @@ interface Salesman{
 export async function fetchSalesmanBy(): Promise<Salesman[]> {
   const token = await getCookies("token");
   const response = await fetch(
-    `http://192.168.0.249:8001/api/v1/users/`,
+    `http://192.168.0.249:8001/api/v1/users/sales/`,
     {
       headers: {
         Authorization: `Bearer ${token?.value}`,

@@ -14,6 +14,7 @@ import { fetchUserList } from "@/api/User/fetchUserList";
 import { FaBan, FaEye } from "react-icons/fa";
 import { fetchLiquidationDataById } from "@/api/liquidations/fetchView";
 import { UpdateView, updateView } from "@/api/liquidations/updateView";
+import LoadingId from "@/components/Loading/LoadingId";
 
 interface LiquidationId {
   id: number;
@@ -47,7 +48,7 @@ export default function ViewLiquidation(props: LiquidationId) {
   });
 
   useEffect(() => {
-    console.log(liquidationData?.project_name); // Check the value here
+    // console.log(liquidationData?.project_name); // Check the value here
   }, [liquidationData]);
 
   const { mutate: updatedView } = useMutation({
@@ -107,7 +108,7 @@ export default function ViewLiquidation(props: LiquidationId) {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingId />;
   }
 
   if (isError) {
@@ -122,10 +123,10 @@ export default function ViewLiquidation(props: LiquidationId) {
     <>
       <div className="flex justify-start">
         <button
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow transition duration-200"
+          className="uppercase flex items-center gap-2 bg-white  text-blue-800 border border-blue-800 px-4 py-2 rounded-md shadow transition duration-200"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaEye className="w-6 h-6 btn-info" />
+          {/* <FaEye className="w-6 h-6 btn-info" /> */}
           View
         </button>
       </div>
@@ -137,7 +138,7 @@ export default function ViewLiquidation(props: LiquidationId) {
             <div className="flex justify-between items-center">
               <h3 className="font-bold text-lg">Cash Request</h3>
               {/* Toggle between CiEdit and CiCircleBan based on editability */}
-              {isEditable ? (
+              {/* {isEditable ? (
                 <FaBan
                   onClick={() => setIsEditable(false)} // Switch to readonly mode
                   className="w-6 h-6 cursor-pointer"
@@ -147,6 +148,21 @@ export default function ViewLiquidation(props: LiquidationId) {
                   onClick={() => setIsEditable(true)} // Switch to editable mode
                   className="w-6 h-6 cursor-pointer"
                 />
+              )} */}
+              {isEditable ? (
+                <span
+                  onClick={() => setIsEditable(false)} // Switch to readonly mode
+                  className="text-red-600 uppercase hover:underline cursor-pointer font-medium"
+                >
+                  Cancel
+                </span>
+              ) : (
+                <span
+                  onClick={() => setIsEditable(true)} // Switch to editable mode
+                  className="text-blue-600 uppercase hover:underline cursor-pointer font-medium"
+                >
+                  Edit
+                </span>
               )}
             </div>
 
@@ -212,7 +228,7 @@ export default function ViewLiquidation(props: LiquidationId) {
                 );
 
                 return (
-                  <Form className="py-4">
+                  <Form className="py-4 uppercase">
                     <div className="flex items-center space-x-6">
                       <div className="w-1/3">
                         <img
@@ -253,7 +269,7 @@ export default function ViewLiquidation(props: LiquidationId) {
                             },
                           ].map((item) => (
                             <div key={item.name}>
-                              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                              <label className="block mb-2 text-sm font-bold text-gray-700 dark:text-white">
                                 {item.label}
                               </label>
                               {item.type === "select" ? (
@@ -403,7 +419,7 @@ export default function ViewLiquidation(props: LiquidationId) {
                                     vatIncluded: false,
                                   })
                                 }
-                                className="btn btn-info mt-4"
+                                className="btn bg-white mt-1 mb-1 text-black border border-black uppercase"
                               >
                                 Add Row
                               </button>
@@ -414,7 +430,7 @@ export default function ViewLiquidation(props: LiquidationId) {
                     </div>
 
                     {/* Total Row */}
-                    <div className="flex justify-between py-2 border-t border-gray-300">
+                    {/* <div className="flex justify-between py-2 border-t border-gray-300">
                       <div className="ml-auto flex space-x-4">
                         <div className="font-semibold">Total</div>
                         <div className="w-1/4">
@@ -442,27 +458,106 @@ export default function ViewLiquidation(props: LiquidationId) {
                           />
                         </div>
                       </div>
+                    </div> */}
+                    <div className="flex justify-between py-2 border-t border-gray-300">
+                      <div className="mb-4">
+                        <h4 className="font-semibold">Take Notes</h4>
+                        <FieldArray
+                          name="notesRows"
+                          render={(arrayHelpers) => (
+                            <div>
+                              {values.notesRows?.map((noteRow, index) => (
+                                <div key={index} className="mb-2">
+                                  <Field
+                                    type="text"
+                                    name={`notesRows[${index}].note`}
+                                    className="input dark:bg-gray-dark dark:text-white dark:border border-black"
+                                    placeholder="Enter note"
+                                    disabled={!isEditable}
+                                    readOnly={!isEditable}
+                                  />
+
+                                  {/* Conditionally render "Remove" button */}
+                                  {isEditable && (
+                                    <button
+                                      type="button"
+                                      onClick={() => arrayHelpers.remove(index)}
+                                      // className="btn btn-danger ml-2"
+                                      className="bg-white  text-red-800 border border-red-800 px-3 py-1.5 rounded-md text-xs shadow transition duration-200 uppercase"
+                                    >
+                                      Remove
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+
+                              {/* Conditionally render "Add Note" button */}
+                              {isEditable && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    arrayHelpers.push({ note: "" })
+                                  }
+                                  className="btn bg-white border border-black mt-1 text-black uppercase"
+                                >
+                                  Add Note
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        />
+                      </div>
+                      <div className="ml-auto flex space-x-4">
+                        <div className="flex flex-col items-start">
+                          <div className="font-semibold">Total Expenses</div>
+                          <input
+                            type="number"
+                            value={totalExpenses}
+                            readOnly
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-white"
+                          />
+                        </div>
+                        <div className="flex flex-col items-start">
+                          <div className="font-semibold">
+                            Cash from Accounting
+                          </div>
+                          <input
+                            type="number"
+                            value={totalCashFromAccounting}
+                            readOnly
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-white"
+                          />
+                        </div>
+                        <div className="flex flex-col items-start">
+                          <div className="font-semibold">Cash from Balance</div>
+                          <input
+                            type="number"
+                            value={totalCashFromBalance}
+                            readOnly
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-white"
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     {/* Take Notes Section */}
-                    <div className="mb-4">
+                    {/* <div className="mb-4">
                       <h4 className="font-semibold">Take Notes</h4>
                       <FieldArray
                         name="notesRows"
                         render={(arrayHelpers) => (
                           <div>
-                            {values.notesRows.map((noteRow, index) => (
+                            {values.notesRows?.map((noteRow, index) => (
                               <div key={index} className="mb-2">
                                 <Field
                                   type="text"
                                   name={`notesRows[${index}].note`}
-                                  className="input dark:bg-gray-dark dark:text-white dark:border border-white"
+                                  className="input dark:bg-gray-dark dark:text-white dark:border border-black"
                                   placeholder="Enter note"
                                   disabled={!isEditable}
                                   readOnly={!isEditable}
                                 />
 
-                                {/* Conditionally render "Remove" button */}
                                 {isEditable && (
                                   <button
                                     type="button"
@@ -474,13 +569,11 @@ export default function ViewLiquidation(props: LiquidationId) {
                                 )}
                               </div>
                             ))}
-
-                            {/* Conditionally render "Add Note" button */}
                             {isEditable && (
                               <button
                                 type="button"
                                 onClick={() => arrayHelpers.push({ note: "" })}
-                                className="btn btn-info mt-4"
+                                className="btn btn-info mt-4 text-white uppercase"
                               >
                                 Add Note
                               </button>
@@ -488,9 +581,8 @@ export default function ViewLiquidation(props: LiquidationId) {
                           </div>
                         )}
                       />
-                    </div>
+                    </div> */}
 
-                    {/* Submit and Cancel Buttons */}
                     <div className="modal-action">
                       <button type="submit" className="btn">
                         Submit

@@ -54,45 +54,47 @@ export default function Page() {
     return <div>An error has occurred: {error.message}</div>;
 
   return (
-    <div className="p-4 sm:ml-64">
-      {/* Buttons to switch between views */}
-      <div className="flex gap-4 mb-4">
-        <button
-          className={`btn ${
-            activeView === "inventory"
-              ? "bg-blue-500 text-white"
-              : "bg-transparent text-blue-500"
-          }`}
-          onClick={() => handleButtonClick("inventory")}
-        >
-          Inventory
-        </button>
-        <button
-          className={`btn ${
-            activeView === "remarksLog"
-              ? "bg-blue-500 text-white"
-              : "bg-transparent text-blue-500"
-          }`}
-          onClick={() => handleButtonClick("remarksLog")}
-        >
-          Remarks Log
-        </button>
-        <button
-          className={`btn ${
-            activeView === "selectionList"
-              ? "bg-blue-500 text-white"
-              : "bg-transparent text-blue-500"
-          }`}
-          onClick={() => handleButtonClick("selectionList")}
-        >
-          Selection List
-        </button>
-      </div>
+    <div className="p-4">
+      <div>
+        {/* Buttons to switch between views */}
+        <div className="flex gap-4 mb-4">
+          <button
+            className={`btn ${
+              activeView === "inventory"
+                ? "bg-blue-500 text-white"
+                : "bg-transparent text-blue-500"
+            }`}
+            onClick={() => handleButtonClick("inventory")}
+          >
+            Inventory
+          </button>
+          <button
+            className={`btn ${
+              activeView === "remarksLog"
+                ? "bg-blue-500 text-white"
+                : "bg-transparent text-blue-500"
+            }`}
+            onClick={() => handleButtonClick("remarksLog")}
+          >
+            Remarks Log
+          </button>
+          <button
+            className={`btn ${
+              activeView === "selectionList"
+                ? "bg-blue-500 text-white"
+                : "bg-transparent text-blue-500"
+            }`}
+            onClick={() => handleButtonClick("selectionList")}
+          >
+            Selection List
+          </button>
+        </div>
 
-      {/* Conditionally render content based on activeView */}
-      {activeView === "inventory" && <InventoryCard />}
-      {activeView === "remarksLog" && <RemarksLog />}
-      {activeView === "selectionList" && <SelectionList />}
+        {/* Conditionally render content based on activeView */}
+        {activeView === "inventory" && <InventoryCard />}
+        {activeView === "remarksLog" && <RemarksLog />}
+        {activeView === "selectionList" && <SelectionList />}
+      </div>
     </div>
   );
 }

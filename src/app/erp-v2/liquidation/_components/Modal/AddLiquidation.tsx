@@ -53,12 +53,12 @@ export default function AddLiquidation() {
     }
   );
 
-  useEffect(() => {
-    if (selectedProject && projectDetails) {
-      setProjectName(projectDetails.special_instructions); // Set project name
-      setDateRequested(projectDetails.date_requested); // Set date_requested
-    }
-  }, [selectedProject, projectDetails]);
+  // useEffect(() => {
+  //   if (selectedProject && projectDetails) {
+  //     setProjectName(projectDetails.special_instructions); // Set project name
+  //     setDateRequested(projectDetails.date_requested); // Set date_requested
+  //   }
+  // }, [selectedProject, projectDetails]);
 
   const { data: users } = useQuery({
     queryKey: ["users"],
@@ -69,14 +69,107 @@ export default function AddLiquidation() {
   //   const handleSubmit = (values: any) => {
   //     console.log(values);
   //   };
-  const handleSubmit = (values: any) => {
+  // const handleSubmit = (values: any) => {
+  //   const liquidationData: AddLiq = {
+  //     id: Number(selectedProject),
+  //     liquidation_no: "LQ-" + Date.now(), // You can replace this with dynamic logic for liquidation number
+  //     photos: "", // Add logic to handle photos if applicable
+  //     project_name: projectName || "",
+  //     date: values.date, // Ensure this is the correct field in your form
+  //     remitted_by: values.remittedBy, // Ensure this matches the form field name
+  //     total: String(
+  //       values.tableRows.reduce(
+  //         (acc, row) => acc + parseFloat(row.balance || "0"),
+  //         0
+  //       )
+  //     ),
+  //     task_notes: values.task_notes,
+
+  //   };
+
+  //   registerCategory(liquidationData);
+  //   console.log(liquidationData);
+  // };
+  // const handleSubmit = (values: any) => {
+  //   const liquidationData: AddLiq = {
+  //     id: Number(selectedProject),
+  //     liquidation_no: "LQ-" + Date.now(),
+  //     photos: [], // ← backend expects a list, not a string
+  //     project_name: projectName || "",
+  //     date: values.date,
+  //     remitted_by: values.remittedBy,
+  //     total: String(
+  //       values.tableRows.reduce(
+  //         (acc, row) => acc + parseFloat(row.balance || "0"),
+  //         0
+  //       )
+  //     ),
+  //     task_notes: values.task_notes,
+  //     liquidation_particulars: values.tableRows, // ✅ fix here
+  //   };
+
+  //   registerCategory(liquidationData);
+  //   console.log(liquidationData);
+  // };
+  // const handleSubmit = (values: any) => {
+  //   const mappedParticulars = values.tableRows.map((row: any) => ({
+  //     // date: row.date_requested || dateRequested,
+  //     date: row.date || dateRequested || new Date().toISOString().split("T")[0],
+
+  //     particulars: row.item || row.particulars,
+  //     expenses: row.expenses,
+  //     cash_from_accounting: row.cashFromAccounting,
+  //     // balance: row.balance,
+  //     balance:
+  //       parseFloat(row.expenses || "0") -
+  //       parseFloat(row.cashFromAccounting || "0"),
+  //     vat_included: row.vatIncluded,
+  //   }));
+
+  //   const liquidationData: AddLiq = {
+  //     id: Number(selectedProject),
+  //     liquidation_no: "LQ-" + Date.now(),
+  //     photos: [],
+  //     // project_name: projectName || "",
+  //     project_name: values.project_name,
+  //     date: values.date,
+  //     remitted_by: values.remittedBy,
+  //     total: String(
+  //       values.tableRows.reduce(
+  //         (acc, row) => acc + parseFloat(row.balance || "0"),
+  //         0
+  //       )
+  //     ),
+  //     task_notes: values.task_notes,
+  //     liquidation_particulars: mappedParticulars,
+  //   };
+
+  //   registerCategory(liquidationData);
+  //   console.log(liquidationData);
+  //   setShowRegisterModal(false);
+  // };
+  const handleSubmit = (values: any, { resetForm }: { resetForm: any }) => {
+    const mappedParticulars = values.tableRows.map((row: any) => ({
+      date:
+        row.date ||
+        values.date_requested ||
+        new Date().toISOString().split("T")[0],
+      particulars: row.item || row.particulars,
+      expenses: row.expenses,
+      cash_from_accounting: row.cashFromAccounting,
+      balance:
+        parseFloat(row.expenses || "0") -
+        parseFloat(row.cashFromAccounting || "0"),
+      vat_included: row.vatIncluded,
+    }));
+
     const liquidationData: AddLiq = {
-      id: Number(selectedProject),
-      liquidation_no: "LQ-" + Date.now(), // You can replace this with dynamic logic for liquidation number
-      photos: "", // Add logic to handle photos if applicable
-      project_name: projectName || "",
-      date: values.date, // Ensure this is the correct field in your form
-      remitted_by: values.remittedBy, // Ensure this matches the form field name
+      id: Number(values.project),
+      liquidation_no: "LQ-" + Date.now(),
+      photos: [],
+      project_name: values.project_name,
+      date: values.date,
+      remitted_by: values.remittedBy,
       total: String(
         values.tableRows.reduce(
           (acc, row) => acc + parseFloat(row.balance || "0"),
@@ -84,20 +177,49 @@ export default function AddLiquidation() {
         )
       ),
       task_notes: values.task_notes,
+      liquidation_particulars: mappedParticulars,
     };
 
     registerCategory(liquidationData);
     console.log(liquidationData);
+    resetForm({
+      values: {
+        project: "",
+        photos: [],
+        id: "",
+        project_name: "",
+        date: "",
+        date_requested: "",
+        liquidation_particulars: [],
+        cash_requisition: "",
+        remitted_by: "",
+        received_by: "",
+        tableRows: [
+          {
+            date: "",
+            item: "",
+            particulars: "",
+            expenses: "",
+            cashFromAccounting: "",
+            balance: "",
+            vatIncluded: false,
+          },
+        ],
+        task_notes: [{ task_notes: "", items: "", description: "" }],
+      },
+    });
+
+    setShowRegisterModal(false);
   };
 
   return (
     <>
       <div className="flex justify-start">
         <button
-          className="btn btn-info"
+          className="btn bg-white  text-black  border border-black uppercase"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaCirclePlus className="w-6 h-6 btn-info" />
+          {/* <FaCirclePlus className="w-6 h-6 btn-info" /> */}
           Add Liquidation
         </button>
       </div>
@@ -106,7 +228,7 @@ export default function AddLiquidation() {
       {showRegisterModal && (
         <dialog open className="modal mt-15 backdrop-blur-sm">
           <div className="modal-box w-11/12 max-w-7xl max-h-[80vh] overflow-y-auto dark:bg-gray-dark dark:text-white">
-            <h3 className="font-bold text-lg dark:bg-gray-dark dark:text-white">
+            <h3 className="font-bold text-lg dark:bg-gray-dark dark:text-white text-center uppercase">
               Create New Liquidation
             </h3>
             <Formik
@@ -114,7 +236,7 @@ export default function AddLiquidation() {
                 project: "",
                 photos: [],
                 id: projectDetails?.id || "",
-                project_name: projectDetails?.project_name || "",
+                project_name: "",
                 date: "",
                 date_requested: projectDetails?.date_requested || "",
                 liquidation_particulars:
@@ -124,7 +246,7 @@ export default function AddLiquidation() {
                 received_by: "",
                 tableRows: projectDetails?.cash_requisition_items || [
                   {
-                    date_requested: "",
+                    date: "",
                     particulars: "",
                     expenses: "",
                     cashFromAccounting: "",
@@ -144,8 +266,24 @@ export default function AddLiquidation() {
                 useEffect(() => {
                   if (projectDetails) {
                     setFieldValue(
+                      "project_name",
+                      projectDetails.special_instructions || ""
+                    );
+                    setFieldValue(
+                      "date_requested",
+                      projectDetails.date_requested || ""
+                    );
+
+                    setFieldValue(
                       "tableRows",
-                      projectDetails.cash_requisition_items || []
+                      projectDetails.cash_requisition_items?.map((item) => ({
+                        date: projectDetails.date_requested || "",
+                        item: item.item || item.special_instructions || "",
+                        expenses: item.expenses || item.total_price || "",
+                        cashFromAccounting: "",
+                        balance: "",
+                        vatIncluded: false,
+                      })) || []
                     );
                   }
                 }, [projectDetails, setFieldValue]);
@@ -165,10 +303,10 @@ export default function AddLiquidation() {
                 );
 
                 return (
-                  <Form className="py-4">
+                  <Form className="py-1 uppercase">
                     {/* Dropdown for Project Selection */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:bg-gray-dark dark:text-white">
+                    <div className="mb-1">
+                      <label className="block text-sm  font-bold text-gray-700 dark:bg-gray-dark dark:text-white">
                         Select Project
                       </label>
                       <Field
@@ -180,6 +318,7 @@ export default function AddLiquidation() {
                           setSelectedProject(projectId); // Set selected project
                           setFieldValue("project", projectId); // Update Formik state
                           setFieldValue("liquidation_particulars", []); // Clear liquidation particulars when changing project
+                          setFieldValue("project_name", ""); // Clear project name
                         }}
                       >
                         <option value="">Select a Project</option>
@@ -193,20 +332,20 @@ export default function AddLiquidation() {
 
                     {/* Project Details */}
                     {selectedProject && (
-                      <div className="space-y-4">
-                        <h4 className="font-semibold">Project Details</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        {/* <h4 className="font-semibold">Project Details</h4> */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                           {[
                             {
                               label: "Project Name",
                               name: "projectName",
                               type: "text",
                               placeholder: "Enter project name",
-                              value: projectName || "",
+                              value: values.project_name || "", // Fetch from Formik values
                             },
                             {
                               label: "Date",
-                              name: "projectDate",
+                              name: "date",
                               type: "date",
                               placeholder: "",
                             },
@@ -224,7 +363,7 @@ export default function AddLiquidation() {
                             },
                           ].map((item) => (
                             <div key={item.name}>
-                              <label className="block mb-2 text-sm font-medium text-gray-700 dark:bg-gray-dark dark:text-white">
+                              <label className="block mb-1 text-sm font-bold text-gray-700 dark:bg-gray-dark dark:text-white">
                                 {item.label}
                               </label>
                               {item.type === "select" ? (
@@ -258,13 +397,13 @@ export default function AddLiquidation() {
                     )}
 
                     {/* Table for Adding Expenses */}
-                    <div className="space-y-4">
-                      <h4 className="font-semibold">Expenses</h4>
+                    <div className="space-y-4 mt-3">
+                      {/* <h4 className="font-semibold">Expenses</h4> */}
                       <FieldArray
                         name="tableRows"
                         render={(arrayHelpers) => (
                           <div>
-                            <table className="table-auto w-full border-collapse">
+                            <table className="table-zebra w-full border border-collapse">
                               <thead>
                                 <tr>
                                   {[
@@ -276,7 +415,10 @@ export default function AddLiquidation() {
                                     "VAT Inc",
                                     "Action",
                                   ].map((header) => (
-                                    <th key={header} className="p-2 text-left">
+                                    <th
+                                      key={header}
+                                      className="p-2 text-center bg-gray-200 border "
+                                    >
                                       {header}
                                     </th>
                                   ))}
@@ -287,12 +429,14 @@ export default function AddLiquidation() {
                                   <tr key={index}>
                                     <td className="p-2">
                                       <Field
-                                        name={`tableRows[${index}].date_requested`}
+                                        name={`tableRows[${index}].date`}
+                                        type="date"
                                         className="bg-gray-50 dark:bg-gray-dark dark:text-white border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                        value={
-                                          item.date_requested || dateRequested
-                                        } // Use dateRequested from state
-                                        readOnly // Set it as read-only if needed
+                                        // value={
+                                        //   item.date_requested ||
+                                        //   projectDetails?.date_requested ||
+                                        //   ""
+                                        // }
                                       />
                                     </td>
 
@@ -307,7 +451,7 @@ export default function AddLiquidation() {
                                       <Field
                                         name={`tableRows[${index}].expenses`}
                                         className="bg-gray-50 dark:bg-gray-dark dark:text-white  border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                        value={item.total_price || ""}
+                                        value={item.expenses || ""}
                                       />
                                     </td>
                                     <td className="p-2">
@@ -322,9 +466,9 @@ export default function AddLiquidation() {
                                         // name={`tableRows[${index}].total_price`}
                                         className="bg-gray-50 dark:bg-gray-dark dark:text-white border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                         value={
-                                          item.total_price -
+                                          item.expenses -
                                             item.cashFromAccounting ||
-                                          item.total_price
+                                          item.expenses
                                         }
                                       />
                                     </td>
@@ -332,7 +476,7 @@ export default function AddLiquidation() {
                                       <Field
                                         type="checkbox"
                                         name={`tableRows[${index}].vatIncluded`}
-                                        className="checkbox dark:bg-gray-dark border border-white dark:text-white  dark:checked:border-white"
+                                        className="checkbox dark:bg-gray-dark border border-black dark:text-white  dark:checked:border-white"
                                       />
                                     </td>
                                     <td className="p-2">
@@ -341,7 +485,8 @@ export default function AddLiquidation() {
                                         onClick={() =>
                                           arrayHelpers.remove(index)
                                         }
-                                        className="btn btn-danger"
+                                        // className="btn btn-danger"
+                                        className="flex items-center gap-1 bg-white text-red-800 border border-red-800 px-3 py-1.5 rounded-md text-xs shadow transition duration-200 uppercase"
                                       >
                                         Remove
                                       </button>
@@ -355,6 +500,8 @@ export default function AddLiquidation() {
                               onClick={() =>
                                 arrayHelpers.push({
                                   date_requested: "",
+                                  // date_requested: dateRequested || "",
+
                                   particulars: "",
                                   expenses: "",
                                   cashFromAccounting: "",
@@ -362,7 +509,7 @@ export default function AddLiquidation() {
                                   vatIncluded: false,
                                 })
                               }
-                              className="btn btn-info mt-4"
+                              className="btn bg-white mt-4 mb-4 text-black border border-black uppercase"
                             >
                               Add Row
                             </button>
@@ -372,7 +519,7 @@ export default function AddLiquidation() {
                     </div>
 
                     {/* Total Row */}
-                    <div className="flex justify-between py-2 border-t border-gray-300">
+                    {/* <div className="flex justify-between py-2 border-t border-gray-300">
                       <div className="ml-auto flex space-x-4 ">
                         <div className="font-semibold">Total</div>
                         <div className="w-1/4">
@@ -400,7 +547,41 @@ export default function AddLiquidation() {
                           />
                         </div>
                       </div>
+                    </div> */}
+                    <div className="flex justify-between py-2 border-t border-gray-300">
+                      <div className="ml-auto flex space-x-4">
+                        <div className="flex flex-col items-start">
+                          <div className="font-semibold">Total Expenses</div>
+                          <input
+                            type="number"
+                            value={projectDetails?.sub_total}
+                            readOnly
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-white"
+                          />
+                        </div>
+                        <div className="flex flex-col items-start">
+                          <div className="font-semibold">
+                            Cash from Accounting
+                          </div>
+                          <input
+                            type="number"
+                            value={totalCashFromAccounting}
+                            readOnly
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-white"
+                          />
+                        </div>
+                        <div className="flex flex-col items-start">
+                          <div className="font-semibold">Cash from Balance</div>
+                          <input
+                            type="number"
+                            value={projectDetails?.total}
+                            readOnly
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-white"
+                          />
+                        </div>
+                      </div>
                     </div>
+
                     {/* Take Notes Section */}
                     <div className="mb-4">
                       <h4 className="font-semibold">Take Notes</h4>
@@ -431,7 +612,8 @@ export default function AddLiquidation() {
                                 <button
                                   type="button"
                                   onClick={() => arrayHelpers.remove(index)}
-                                  className="btn btn-danger ml-2"
+                                  // className="btn btn-danger ml-2"
+                                  className="flex items-center gap-1 bg-white border border-red-800 hover:bg-red-700 text-red-800 px-3 py-1.5 rounded-md text-xs shadow transition duration-200 uppercase"
                                 >
                                   Remove
                                 </button>
@@ -447,7 +629,7 @@ export default function AddLiquidation() {
                                   description: "",
                                 })
                               }
-                              className="btn btn-info mt-4"
+                              className="btn bg-white mt-1 text-black border border-black uppercase"
                             >
                               Add Note
                             </button>

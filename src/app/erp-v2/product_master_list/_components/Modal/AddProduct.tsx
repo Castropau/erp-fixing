@@ -117,10 +117,10 @@ export default function AddProduct() {
     <>
       <div className="flex justify-end mb-4">
         <button
-          className="btn btn-info"
+          className="btn bg-white text-black border border-black uppercase"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaCirclePlus className="w-6 h-6 btn-info" />
+          {/* <FaCirclePlus className="w-6 h-6 btn-info" /> */}
           Add item list
         </button>
       </div>
@@ -129,7 +129,9 @@ export default function AddProduct() {
         {showRegisterModal && (
           <dialog open className="modal mt-15 backdrop-blur-sm">
             <div className="modal-box w-11/12 max-w-7xl max-h-[80vh] overflow-y-auto dark:bg-gray-dark dark:text-white">
-              <h3 className="font-bold text-lg">Add item</h3>
+              {/* <h3 className="font-bold text-lg uppercase text-center">
+                Add item
+              </h3> */}
               <Formik
                 initialValues={{
                   vendor: "",
@@ -147,16 +149,17 @@ export default function AddProduct() {
                 onSubmit={(values, { resetForm }) => {
                   registerItem({
                     ...values,
-                    unit_price: parseFloat(values.unit_price),
-                    srp: parseFloat(values.srp),
-                    vat_percentage: parseFloat(values.vat_percentage),
+                    unit_price: values.unit_price,
+                    srp: values.srp,
+                    vat_percentage: values.vat_percentage,
+                    vat_exempt: values.vat_exempted,
                   });
                   resetForm();
                   console.log(values);
                 }}
               >
                 {({ values, setFieldValue }) => (
-                  <Form className="py-4">
+                  <Form className="py-1">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Left column */}
                       <div>
@@ -185,16 +188,44 @@ export default function AddProduct() {
                             placeholder: "Enter unit of measurement",
                             label: "Unit of Measurement",
                           },
+                          {
+                            type: "textarea",
+                            name: "description",
+                            placeholder: "Enter your description",
+                            label: "Description",
+                          },
+                          // ].map((item) => (
+                          //   <div key={item.name} className="mb-1 uppercase ">
+                          //     <label
+                          //       htmlFor={item.name}
+                          //       className="block text-sm font-bold "
+                          //     >
+                          //       {item.label}
+                          //     </label>
+                          //     <Field
+                          //       type={item.type}
+                          //       id={item.name}
+                          //       name={item.name}
+                          //       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                          //       placeholder={item.placeholder}
+                          //     />
+                          //   </div>
+                          // ))
                         ].map((item) => (
-                          <div key={item.name} className="mb-4">
+                          <div key={item.name} className="mb-1 uppercase">
                             <label
                               htmlFor={item.name}
-                              className="block text-sm font-medium "
+                              className="block text-sm font-bold"
                             >
                               {item.label}
                             </label>
                             <Field
-                              type={item.type}
+                              as={
+                                item.type === "textarea" ? "textarea" : "input"
+                              }
+                              type={
+                                item.type !== "textarea" ? item.type : undefined
+                              }
                               id={item.name}
                               name={item.name}
                               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
@@ -228,10 +259,10 @@ export default function AddProduct() {
                               })) || [],
                           },
                         ].map((item) => (
-                          <div key={item.name} className="mb-4">
+                          <div key={item.name} className="mb-1 uppercase">
                             <label
                               htmlFor={item.name}
-                              className="block text-sm font-medium "
+                              className="block text-sm font-bold "
                             >
                               {item.label}
                             </label>
@@ -272,10 +303,10 @@ export default function AddProduct() {
                             label: "VAT %",
                           },
                         ].map((item) => (
-                          <div key={item.name} className="mb-4">
+                          <div key={item.name} className="mb-1">
                             <label
                               htmlFor={item.name}
-                              className="block text-sm font-medium "
+                              className="block text-sm font-bold "
                             >
                               {item.label}
                             </label>
@@ -290,7 +321,7 @@ export default function AddProduct() {
                         ))}
 
                         {/* VAT Checkbox */}
-                        <div className="mb-4 flex items-center gap-2 ">
+                        <div className="mb-1 flex items-center gap-2 ">
                           <input
                             type="checkbox"
                             id="vat_exempted"
@@ -312,10 +343,10 @@ export default function AddProduct() {
                     </div>
 
                     {/* Description */}
-                    <div className="mb-4">
+                    {/* <div className="mb-1">
                       <label
                         htmlFor="description"
-                        className="block text-sm font-medium "
+                        className="block text-sm font-bold uppercase "
                       >
                         Description
                       </label>
@@ -326,7 +357,7 @@ export default function AddProduct() {
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                         placeholder="Enter your description"
                       />
-                    </div>
+                    </div> */}
 
                     {/* Actions */}
                     <div className="modal-action">

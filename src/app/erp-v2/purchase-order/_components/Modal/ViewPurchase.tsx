@@ -80,15 +80,26 @@ export default function ViewPurchase(props: PurchaseId) {
   const handleSubmit = (values: any) => {
     console.log(values);
   };
+  if (Rloading) {
+    return (
+      <div className="flex justify-center items-center space-x-2">
+        {/* Spinner */}
+        <div className="w-6 h-6 border-4 border-dashed border-gray-400 border-t-transparent rounded-full animate-spin dark:border-gray-200 dark:border-t-transparent"></div>
 
+        <span className="text-sm text-gray-700 dark:text-gray-300">
+          Loading...
+        </span>
+      </div>
+    );
+  }
   return (
     <>
       <div className="flex justify-start">
         <button
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow transition duration-200"
+          className="uppercase flex items-center gap-2 bg-white  text-blue-800 border border-blue-800 px-4 py-2 rounded-md shadow transition duration-200"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaEye className="w-6 h-6 btn-info" />
+          {/* <FaEye className="w-6 h-6 btn-info" /> */}
           View
         </button>
       </div>
@@ -97,9 +108,11 @@ export default function ViewPurchase(props: PurchaseId) {
       {showRegisterModal && (
         <dialog open className="modal mt-15 backdrop-blur-sm">
           <div className="modal-box w-11/12 max-w-7xl relative max-h-[80vh] overflow-y-auto dark:bg-gray-dark ">
-            <h3 className="font-bold text-lg">View Purchase Order</h3>
+            <h3 className="font-bold text-lg text-center uppercase">
+              View Purchase Order
+            </h3>
             {/* Edit Icon */}
-            <button
+            {/* <button
               onClick={() => setIsEditMode(!isEditMode)}
               className="absolute top-4 right-4"
               aria-label={isEditMode ? "Disable Editing" : "Enable Editing"}
@@ -109,7 +122,23 @@ export default function ViewPurchase(props: PurchaseId) {
               ) : (
                 <FaEdit className="text-blue-500 w-6 h-6" />
               )}
-            </button>
+            </button> */}
+
+            {isEditMode ? (
+              <span
+                onClick={() => setIsEditMode(!isEditMode)} // Switch to readonly mode
+                className="text-red-600 hover:underline cursor-pointer font-medium absolute top-4 right-4 uppercase"
+              >
+                Cancel
+              </span>
+            ) : (
+              <span
+                onClick={() => setIsEditMode(true)} // Switch to editable mode
+                className="text-blue-600 hover:underline cursor-pointer font-medium absolute top-4 right-4 uppercase"
+              >
+                Edit
+              </span>
+            )}
 
             <Formik
               initialValues={{
@@ -179,10 +208,10 @@ export default function ViewPurchase(props: PurchaseId) {
                 );
 
                 return (
-                  <Form className="py-4">
+                  <Form className="py-1">
                     {/* Dropdown for Project Selection */}
                     {!isEditMode && (
-                      <div className="space-y-4 mt-4">
+                      <div className="space-y-1 mt-1">
                         {[
                           {
                             label: "Vendor",
@@ -211,7 +240,7 @@ export default function ViewPurchase(props: PurchaseId) {
                         ))}
                       </div>
                     )}
-                    <div className="mt-6">
+                    <div className="mt-1">
                       <h4 className="font-semibold">Terms & Conditions</h4>
                       <Field
                         as="textarea"
@@ -223,7 +252,7 @@ export default function ViewPurchase(props: PurchaseId) {
                     </div>
 
                     {isEditMode && (
-                      <div className="mb-4">
+                      <div className="mb-1">
                         <label className="block text-sm font-medium text-gray-700">
                           Company
                         </label>
@@ -268,8 +297,8 @@ export default function ViewPurchase(props: PurchaseId) {
                     {/* {isEditMode && selectedProject && ( */}
                     {isEditMode && (
                       <div className="space-y-4">
-                        <h4 className="font-semibold">Project Details</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {/* <h4 className="font-semibold">Project Details</h4> */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                           {[
                             {
                               label: "Address",
@@ -326,22 +355,26 @@ export default function ViewPurchase(props: PurchaseId) {
                     )}
 
                     {/* Table for Adding Expenses */}
-                    <div className="space-y-4">
-                      <h4 className="font-semibold">Expenses</h4>
+                    <div className="space-y-1 mt-4">
+                      {/* <h4 className="font-semibold">Expenses</h4> */}
                       <FieldArray
                         name="tableRows"
                         render={(arrayHelpers) => (
                           <div>
-                            <table className="table-auto w-full border-collapse">
-                              <thead>
+                            <table className="table-zebra  w-full border-collapse uppercase">
+                              <thead className=" ">
                                 <tr>
                                   {[
                                     "# ITEM",
                                     "Description",
                                     "Unit price",
                                     "Quantity",
+                                    "Total",
                                   ].map((header) => (
-                                    <th key={header} className="p-2 text-left">
+                                    <th
+                                      key={header}
+                                      className="p-2 text-center bg-gray-200 border border-black"
+                                    >
                                       {header}
                                     </th>
                                   ))}
@@ -350,7 +383,7 @@ export default function ViewPurchase(props: PurchaseId) {
                               <tbody>
                                 {values.tableRows.map((row, index) => (
                                   <tr key={index}>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="text"
                                         name={`tableRows[${index}].item`}
@@ -358,7 +391,7 @@ export default function ViewPurchase(props: PurchaseId) {
                                         disabled={!isEditMode} // Disable when not in edit mode
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="text"
                                         name={`tableRows[${index}].description`}
@@ -366,7 +399,7 @@ export default function ViewPurchase(props: PurchaseId) {
                                         disabled={!isEditMode} // Disable when not in edit mode
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`tableRows[${index}].unit_price`}
@@ -392,7 +425,7 @@ export default function ViewPurchase(props: PurchaseId) {
                                         }}
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`tableRows[${index}].quantity`}
@@ -417,7 +450,7 @@ export default function ViewPurchase(props: PurchaseId) {
                                         }}
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`tableRows[${index}].total`}
@@ -425,19 +458,19 @@ export default function ViewPurchase(props: PurchaseId) {
                                         className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-dark dark:text-white"
                                       />
                                     </td>
-                                    <td className="p-2">
-                                      {isEditMode && (
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            arrayHelpers.remove(index)
-                                          }
-                                          className="btn btn-danger"
-                                        >
-                                          Remove
-                                        </button>
-                                      )}
-                                    </td>
+
+                                    {isEditMode && (
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          arrayHelpers.remove(index)
+                                        }
+                                        // className="btn btn-danger uppercase"
+                                        className="flex items-center gap-1 mt-4 ml-2 bg-white  text-red-800 border border-red-800 px-3 py-1.5 rounded-md text-xs shadow transition duration-200 uppercase"
+                                      >
+                                        Remove
+                                      </button>
+                                    )}
                                   </tr>
                                 ))}
                               </tbody>
@@ -454,7 +487,7 @@ export default function ViewPurchase(props: PurchaseId) {
                                     total: 0,
                                   })
                                 }
-                                className="btn btn-info mt-4"
+                                className="btn bg-white mt-2 border border-black text-black uppercase mb-4"
                                 disabled={!isEditMode} // Disable when not in edit mode
                               >
                                 Add Row
@@ -525,13 +558,6 @@ export default function ViewPurchase(props: PurchaseId) {
                             disabled={!isEditMode}
                           />
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Grand Total */}
-                    <div className="flex justify-between py-2 border-t border-gray-300">
-                      <div className="ml-auto flex space-x-4 w-full">
-                        {/* Grand Total */}
                         <div className="flex flex-col w-1/4">
                           <label className="font-semibold">Grand Total</label>
                           <input
@@ -552,16 +578,40 @@ export default function ViewPurchase(props: PurchaseId) {
                       </div>
                     </div>
 
+                    {/* Grand Total */}
+                    <div className="flex justify-between py-2 border-t border-gray-300">
+                      <div className="ml-auto flex space-x-4 w-full">
+                        {/* Grand Total */}
+                        {/* <div className="flex flex-col w-1/4">
+                          <label className="font-semibold">Grand Total</label>
+                          <input
+                            type="number"
+                            // value={(() => {
+                            //   const discountAmount =
+                            //     totalExpenses * (values.discount / 100) || 0;
+                            //   const vatAmount =
+                            //     totalExpenses * (values.vat / 100) || 0;
+                            //   return totalExpenses - discountAmount + vatAmount;
+                            // })()}
+                            value={PurchaseData?.grand_total}
+                            readOnly
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-white"
+                            disabled={!isEditMode}
+                          />
+                        </div> */}
+                      </div>
+                    </div>
+
                     {/* Submit and Cancel Buttons */}
                     <div className="modal-action">
                       {isEditMode ? (
                         <>
-                          <button type="submit" className="btn">
+                          <button type="submit" className="btn uppercase">
                             Update
                           </button>
                           <button
                             type="button"
-                            className="btn"
+                            className="btn  text-black"
                             onClick={() => setShowRegisterModal(false)}
                           >
                             Cancel
@@ -570,7 +620,7 @@ export default function ViewPurchase(props: PurchaseId) {
                       ) : (
                         <button
                           type="button"
-                          className="btn"
+                          className="btn bg-white border border-black text-black"
                           onClick={() => setShowRegisterModal(false)}
                         >
                           Cancel

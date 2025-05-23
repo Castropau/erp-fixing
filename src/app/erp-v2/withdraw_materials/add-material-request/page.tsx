@@ -20,7 +20,12 @@ export default function Page() {
     queryFn: fetchRoleData,
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-full w-full">
+        <span className="loading loading-dots loading-xl text-primary"></span>
+      </div>
+    );
 
   if (error instanceof Error)
     return <div>An error has occurred: {error.message}</div>;
@@ -35,7 +40,7 @@ export default function Page() {
   const usersCount = uniqueUsers.size;
 
   return (
-    <div className="p-4 sm:ml-64">
+    <div className="p-4">
       <CreateMaterialRequest />
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FaCirclePlus, FaEye } from "react-icons/fa6";
 import { Formik, Field, Form, FieldArray } from "formik";
@@ -15,6 +15,10 @@ import { CashUnits } from "@/api/cash-request/fetchUnit";
 import { updateCashId } from "@/api/cash-request/updateCashRequestId";
 import { ChequeItems, Items } from "@/api/cheque-request/fetchItems";
 import { Supplier } from "@/api/cash-request/fetchSupplier";
+import LoadingId from "@/components/Loading/LoadingId";
+import { PDFViewer } from "@react-pdf/renderer";
+import OpenFile from "../../Invoice/OpenFile";
+import { useReactToPrint } from "react-to-print";
 
 interface CashId {
   id: number;
@@ -89,20 +93,43 @@ export default function EditCashRequest(props: CashId) {
     queryFn: fetchUserLists,
   });
 
+  const printPdf = () => {
+    const printWindow = window.open("", "_blank");
+    printWindow?.document.write(`
+          <html>
+            <head>
+              <title>Print PDF</title>
+            </head>
+            <body>
+              <iframe src="/erp-v2/cash-request/Invoice" width="100%" height="100%"></iframe>
+              <script>
+                window.onload = function() {
+                
+                  window.onafterprint = function() {
+                    window.close();
+                  };
+                };
+              <\/script>
+            </body>
+          </html>
+        `);
+    printWindow?.document.close();
+  };
   const handleSubmit = (values: any) => {
     updatedUserCash(values); // Submit the form data when submitted
     console.log(values);
   };
   if (isPending) {
     return (
-      <div className="flex justify-center items-center space-x-2">
-        {/* Spinner */}
-        <div className="w-6 h-6 border-4 border-dashed border-gray-400 border-t-transparent rounded-full animate-spin dark:border-gray-200 dark:border-t-transparent"></div>
+      // <div className="flex justify-center items-center space-x-2">
+      //   {/* Spinner */}
+      //   <div className="w-6 h-6 border-4 border-dashed border-gray-400 border-t-transparent rounded-full animate-spin dark:border-gray-200 dark:border-t-transparent"></div>
 
-        <span className="text-sm text-gray-700 dark:text-gray-300">
-          Loading...
-        </span>
-      </div>
+      //   <span className="text-sm text-gray-700 dark:text-gray-300">
+      //     Loading...s
+      //   </span>
+      // </div>
+      <LoadingId />
     );
   }
 
@@ -111,17 +138,23 @@ export default function EditCashRequest(props: CashId) {
       <div className="flex justify-end">
         <button
           onClick={() => setShowRegisterModal(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow transition duration-200"
+          className="flex items-center gap-2 bg-white text-blue-700 border border-blue-700 px-4 py-2 rounded-md shadow transition duration-200 uppercase"
         >
-          <FaEye className="w-5 h-5" />
+          {/* <FaEye className="w-5 h-5" /> */}
           <span>View</span>
         </button>
       </div>
 
       {showRegisterModal && (
-        <dialog open className="modal mt-5 backdrop-blur-sm">
+        <dialog open className="modal mt-15 backdrop-blur-sm">
           <div className="modal-box w-11/12 max-w-7xl max-h-[80vh] overflow-y-auto dark:bg-gray-dark ">
-            <h3 className="font-bold text-lg">Detail</h3>
+            {/* <h3 className="font-bold text-lg">Detail</h3> */}
+            <button
+              className="ml-250 border border-black text-black uppercase bg-white px-2 py-2"
+              onClick={printPdf}
+            >
+              print
+            </button>
 
             <Formik
               initialValues={{
@@ -195,10 +228,11 @@ export default function EditCashRequest(props: CashId) {
               onSubmit={handleSubmit} // Submit data on form submission
             >
               {({ values, setFieldValue }) => (
-                <Form className="py-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+                <Form className="">
+                  {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 "> */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 ">
                     {/* Heading for Special Information */}
-                    {[
+                    {/* {[
                       {
                         type: "heading",
                         level: 2,
@@ -213,7 +247,7 @@ export default function EditCashRequest(props: CashId) {
                           <h2 className="font-bold text-lg">{item.text}</h2>
                         )}
                       </div>
-                    ))}
+                    ))} */}
 
                     {/* Form Fields */}
                     {[
@@ -257,10 +291,17 @@ export default function EditCashRequest(props: CashId) {
                         value: values.date_requested,
                       },
                     ].map((item) => (
-                      <div key={item.name} className="mb-4 col-span-2">
+                      <div
+                        key={item.name}
+                        className={
+                          item.type === "textarea"
+                            ? "md:col-span-2 ml-2"
+                            : "ml-2 mt-2"
+                        }
+                      >
                         <label
                           htmlFor={item.name}
-                          className="block text-sm font-medium"
+                          className="block text-sm font-bold uppercase"
                         >
                           {item.label}
                         </label>
@@ -273,7 +314,7 @@ export default function EditCashRequest(props: CashId) {
                             id={item.name}
                             name={item.name}
                             value={item.value}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                            className="mt-2 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                             placeholder={item.placeholder}
                           />
                         ) : item.type === "select" ? (
@@ -282,7 +323,7 @@ export default function EditCashRequest(props: CashId) {
                             id={item.name}
                             name={item.name}
                             value={values.requested_by}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                            className="mt-2 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                             onChange={(e: any) =>
                               setFieldValue(item.name, e.target.value)
                             }
@@ -297,10 +338,10 @@ export default function EditCashRequest(props: CashId) {
                         ) : null}
                       </div>
                     ))}
-
-                    {/* Dynamic Items Table */}
-                    <div>
-                      {[{ type: "heading", level: 2, text: "Items" }].map(
+                  </div>
+                  {/* Dynamic Items Table */}
+                  <div>
+                    {/* {[{ type: "heading", level: 2, text: "Items" }].map(
                         (item) => (
                           <div key="items-heading" className="col-span-2 mb-4">
                             {item.type === "heading" && item.level === 2 && (
@@ -308,49 +349,66 @@ export default function EditCashRequest(props: CashId) {
                             )}
                           </div>
                         )
-                      )}
-                      <FieldArray name="cash_requisition_items">
-                        {({ insert, remove, push }) => (
-                          <div>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                push({
-                                  item: "", // Dropdown for users
-                                  quantity: "",
-                                  unit: "",
-                                  description: "",
-                                  supplier: "",
-                                  unit_price: "",
-                                  total: 0,
-                                  discount: 0,
-                                  vat_percentage: 0,
-                                  less_ewt: 0,
-                                  vat_value: 0,
-                                  ewt_value: 0,
-                                  grand_total: 0,
-                                })
-                              }
-                              className="btn btn-info mt-4"
-                            >
-                              Add Item
-                            </button>
+                      )} */}
+                    <FieldArray name="cash_requisition_items">
+                      {({ insert, remove, push }) => (
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              push({
+                                item: "", // Dropdown for users
+                                quantity: "",
+                                unit: "",
+                                description: "",
+                                supplier: "",
+                                unit_price: "",
+                                total: 0,
+                                discount: 0,
+                                vat_percentage: 0,
+                                less_ewt: 0,
+                                vat_value: 0,
+                                ewt_value: 0,
+                                grand_total: 0,
+                              })
+                            }
+                            className="btn bg-white border border-black text-black uppercase mb-2 mt-2"
+                          >
+                            Add Row
+                          </button>
 
-                            {/* Table to display items */}
+                          {/* Table to display items */}
+                          {/* <div className=" shadow-sm">
+                              <table
+                                className="w-full table-auto border-collapse text-sm border border-black"
+                                style={{ width: "200%" }}
+                              >
+                                <thead className="dark:text-white text-center text-black"> */}
+                          <div className="shadow-sm">
                             <table
-                              className="w-full table-auto border-collapse text-sm"
-                              style={{ width: "200%" }}
+                              className="w-full table-zebra min-w-full text-sm  border border-black"
+                              style={{ width: "100%" }}
                             >
-                              <thead className="dark:text-white">
+                              <thead className="bg-gray-200 dark:bg-gray-800 text-center text-black dark:text-white uppercase">
                                 <tr>
-                                  <th className="border p-2">Item</th>
-                                  <th className="border p-2">Quantity</th>
-                                  <th className="border p-2">Unit</th>
-                                  <th className="border p-2">Description</th>
-                                  <th className="border p-2">Supplier</th>
-                                  <th className="border p-2">Unit Price</th>
-                                  <th className="border p-2">Total</th>
-                                  <th className="border p-2">Actions</th>
+                                  <th className="border p-2 text-sm">Item</th>
+                                  <th className="border p-2  text-sm">
+                                    Quantity
+                                  </th>
+                                  <th className="border p-2 text-sm">Unit</th>
+                                  <th className="border p-2 text-sm">
+                                    Description
+                                  </th>
+                                  <th className="border p-2 text-sm">
+                                    Supplier
+                                  </th>
+                                  <th className="border p-2 text-sm">
+                                    Unit Price
+                                  </th>
+                                  <th className="border p-2 text-sm">Total</th>
+                                  <th className="border p-2 text-sm">
+                                    Actions
+                                  </th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -358,7 +416,7 @@ export default function EditCashRequest(props: CashId) {
                                 {values.cash_requisition_items.map(
                                   (item, index) => (
                                     <tr key={index}>
-                                      <td className="border p-2">
+                                      <td className=" p-2 ">
                                         {DisLoading ? (
                                           <div>Loading users...</div>
                                         ) : Derror ? (
@@ -369,7 +427,7 @@ export default function EditCashRequest(props: CashId) {
                                               type="text"
                                               name={`cash_requisition_items[${index}].item`}
                                               list={`ItemList-${index}`}
-                                              className="w-full p-2 border"
+                                              className="w-full p-2 border  dark:border-white text-center border-gray-300 rounded-md shadow-sm"
                                               placeholder="Search or type user"
                                               value={item.item}
                                               onChange={(e) =>
@@ -391,11 +449,11 @@ export default function EditCashRequest(props: CashId) {
                                           </div>
                                         )}
                                       </td>
-                                      <td className="border p-2">
+                                      <td className=" p-2">
                                         <Field
                                           type="number"
                                           name={`cash_requisition_items[${index}].quantity`}
-                                          className="w-full p-2 border"
+                                          className="w-full p-2 border text-center border-gray-300 rounded-md shadow-sm"
                                           placeholder="Quantity"
                                           onChange={(e) =>
                                             setFieldValue(
@@ -406,11 +464,11 @@ export default function EditCashRequest(props: CashId) {
                                           required
                                         />
                                       </td>
-                                      <td className="border p-2">
+                                      <td className=" p-2">
                                         <Field
                                           as="select"
                                           name={`cash_requisition_items[${index}].unit_of_measurement`}
-                                          className="w-full p-2 border dark:bg-gray-dark"
+                                          className="w-full p-2 border dark:bg-gray-dark text-center border-gray-300 rounded-md shadow-sm"
                                           required
                                         >
                                           <option value="">Select unit</option>
@@ -437,16 +495,16 @@ export default function EditCashRequest(props: CashId) {
                                         </Field>
                                       </td>
 
-                                      <td className="border p-2">
+                                      <td className=" p-2">
                                         <Field
                                           type="text"
                                           name={`cash_requisition_items[${index}].description`}
-                                          className="w-full p-2 border"
+                                          className="w-full p-2 border text-center border-gray-300 rounded-md shadow-sm"
                                           placeholder="Description"
                                           required
                                         />
                                       </td>
-                                      <td className="border p-2">
+                                      <td className=" p-2">
                                         {DisLoading ? (
                                           <div>Loading users...</div>
                                         ) : Derror ? (
@@ -457,7 +515,7 @@ export default function EditCashRequest(props: CashId) {
                                               type="text"
                                               name={`cash_requisition_items[${index}].supplier`}
                                               list={`supplierList-${index}`}
-                                              className="w-full p-2 border"
+                                              className="w-full p-2 border text-center border-gray-300 rounded-md shadow-sm"
                                               placeholder="Search or type supplier"
                                               value={item.supplier}
                                               onChange={(e) =>
@@ -481,11 +539,11 @@ export default function EditCashRequest(props: CashId) {
                                           </div>
                                         )}
                                       </td>
-                                      <td className="border p-2">
+                                      <td className=" p-2">
                                         <Field
                                           type="number"
                                           name={`cash_requisition_items[${index}].unit_price`}
-                                          className="w-full p-2 border"
+                                          className="w-full p-2 border text-center border-gray-300 rounded-md shadow-sm"
                                           placeholder="Unit Price"
                                           onChange={(e) =>
                                             setFieldValue(
@@ -496,11 +554,11 @@ export default function EditCashRequest(props: CashId) {
                                           required
                                         />
                                       </td>
-                                      <td className="border p-2">
+                                      <td className=" p-2">
                                         <Field
                                           type="number"
                                           name={`cash_requisition_items[${index}].total`}
-                                          className="w-full p-2 border"
+                                          className="w-full p-2 border text-center border-gray-300 rounded-md shadow-sm"
                                           placeholder="Total"
                                           disabled
                                           value={
@@ -508,11 +566,12 @@ export default function EditCashRequest(props: CashId) {
                                           } // Calculate total
                                         />
                                       </td>
-                                      <td className="border p-2">
+                                      <td className=" p-2">
                                         <button
                                           type="button"
                                           onClick={() => remove(index)}
-                                          className="btn btn-error"
+                                          // className="btn btn-error"
+                                          className="flex items-center gap-1 bg-white  text-red-800 border border-red-800 px-3 py-1.5 rounded-md text-xs shadow transition duration-200 uppercase"
                                         >
                                           Remove
                                         </button>
@@ -522,15 +581,186 @@ export default function EditCashRequest(props: CashId) {
                                 )}
                               </tbody>
                             </table>
+                          </div>
 
-                            {/* Discount, VAT %, and Less EWT input fields */}
-                            <div className="mt-4 grid grid-cols-3 gap-4">
+                          {/* <div className="mt-4 grid grid-cols-3 gap-4">
+                            <div>
+                              <strong>Discount:</strong>
+                              <Field
+                                type="number"
+                                name="discount"
+                                className="w-full p-2 border"
+                                placeholder="Discount"
+                                onChange={(e) =>
+                                  setFieldValue("discount", e.target.value)
+                                }
+                              />
+                            </div>
+
+                            <div>
+                              <strong>VAT %:</strong>
+                              <Field
+                                type="number"
+                                name="vat_percentage"
+                                className="w-full p-2 border"
+                                placeholder="VAT %"
+                                onChange={(e) =>
+                                  setFieldValue(
+                                    "vat_percentage",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
+
+                            <div>
+                              <strong>Less EWT %:</strong>
+                              <Field
+                                type="number"
+                                name="less_ewt"
+                                className="w-full p-2 border"
+                                placeholder="EWT %"
+                                onChange={(e) =>
+                                  setFieldValue("less_ewt", e.target.value)
+                                }
+                              />
+                            </div>
+                          </div>
+
+                          <div className="mt-4 grid grid-cols-3 gap-4">
+                            <div>
+                              <strong>Discount:</strong>
+                              <div className="w-full p-2 border">
+                                ₱
+                                {values.discount
+                                  ? parseFloat(values.discount).toFixed(2)
+                                  : "0.00"}
+                              </div>
+                            </div>
+
+                            <div>
+                              <strong>VAT %:</strong>
+                              <div className="w-full p-2 border">
+                                ₱
+                                {(() => {
+                                  const totalBeforeDiscount =
+                                    values.cash_requisition_items.reduce(
+                                      (acc, item) =>
+                                        acc +
+                                        (item.quantity * item.unit_price || 0),
+                                      0
+                                    );
+
+                                  const discountAmount = parseFloat(
+                                    values.discount || "0"
+                                  );
+                                  const discountedTotal =
+                                    totalBeforeDiscount - discountAmount;
+
+                                  const vatPercentage = parseFloat(
+                                    values.vat_percentage || "0"
+                                  );
+                                  const vatAmount =
+                                    (vatPercentage / 100) * discountedTotal;
+
+                                  return vatAmount.toFixed(2); // Display VAT amount
+                                })()}{" "}
+                              </div>
+                            </div>
+
+                            <div>
+                              <strong>Less EWT %:</strong>
+                              <div className="w-full p-2 border">
+                                ₱
+                                {(() => {
+                                  const totalBeforeDiscount =
+                                    values.cash_requisition_items.reduce(
+                                      (acc, item) =>
+                                        acc +
+                                        (item.quantity * item.unit_price || 0),
+                                      0
+                                    );
+
+                                  const discountAmount = parseFloat(
+                                    values.discount || "0"
+                                  );
+                                  const discountedTotal =
+                                    totalBeforeDiscount - discountAmount;
+
+                                  const ewtPercentage = parseFloat(
+                                    values.less_ewt || "0"
+                                  );
+                                  const ewtAmount =
+                                    (ewtPercentage / 100) * discountedTotal;
+
+                                  return ewtAmount.toFixed(2); // Display EWT amount
+                                })()}{" "}
+                              </div>
+                            </div>
+
+                            <div>
+                              <strong>Total:</strong>
+                              <div className="w-full p-2 border">
+                                ₱
+                                {values.cash_requisition_items
+                                  .reduce(
+                                    (acc, item) =>
+                                      acc +
+                                      (item.quantity * item.unit_price || 0),
+                                    0
+                                  )
+                                  .toFixed(2)}
+                              </div>
+                            </div>
+
+                            <div>
+                              <strong>Grand Total:</strong>
+                              <div className="w-full p-2 border">
+                                ₱
+                                {(() => {
+                                  const totalBeforeDiscount =
+                                    values.cash_requisition_items.reduce(
+                                      (acc, item) =>
+                                        acc +
+                                        (item.quantity * item.unit_price || 0),
+                                      0
+                                    );
+
+                                  const discountAmount = parseFloat(
+                                    values.discount || "0"
+                                  );
+                                  const discountedTotal =
+                                    totalBeforeDiscount - discountAmount;
+
+                                  const vatPercentage = parseFloat(
+                                    values.vat_percentage || "0"
+                                  );
+                                  const vatAmount =
+                                    (vatPercentage / 100) * discountedTotal;
+
+                                  const ewtPercentage = parseFloat(
+                                    values.less_ewt || "0"
+                                  );
+                                  const ewtAmount =
+                                    (ewtPercentage / 100) * discountedTotal;
+
+                                  const grandTotal =
+                                    discountedTotal + vatAmount - ewtAmount;
+
+                                  return grandTotal.toFixed(2); // Display Grand Total
+                                })()}
+                              </div>
+                            </div>
+                          </div> */}
+                          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6 uppercase text-center">
+                            {/* First Row: Input Fields */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               <div>
                                 <strong>Discount:</strong>
                                 <Field
                                   type="number"
                                   name="discount"
-                                  className="w-full p-2 border"
+                                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm text-center"
                                   placeholder="Discount"
                                   onChange={(e) =>
                                     setFieldValue("discount", e.target.value)
@@ -543,7 +773,7 @@ export default function EditCashRequest(props: CashId) {
                                 <Field
                                   type="number"
                                   name="vat_percentage"
-                                  className="w-full p-2 border"
+                                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm text-center"
                                   placeholder="VAT %"
                                   onChange={(e) =>
                                     setFieldValue(
@@ -559,7 +789,7 @@ export default function EditCashRequest(props: CashId) {
                                 <Field
                                   type="number"
                                   name="less_ewt"
-                                  className="w-full p-2 border"
+                                  className="w-full p-2 border border-gray-300 rounded-md shadow-sm text-center"
                                   placeholder="EWT %"
                                   onChange={(e) =>
                                     setFieldValue("less_ewt", e.target.value)
@@ -568,20 +798,11 @@ export default function EditCashRequest(props: CashId) {
                               </div>
                             </div>
 
-                            {/* Display Total Information */}
-                            <div className="mt-4 grid grid-cols-3 gap-4">
+                            {/* Second Row: Calculated Results */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               <div>
                                 <strong>Discount:</strong>
-                                <div className="w-full p-2 border">
-                                  {/* ₱
-                                  {values.cash_requisition_items
-                                    .reduce(
-                                      (acc, item) =>
-                                        acc +
-                                        (item.quantity * item.unit_price || 0),
-                                      0
-                                    )
-                                    .toFixed(2)} */}
+                                <div className="w-full p-2 border border-gray-300 rounded-md shadow-sm">
                                   ₱
                                   {values.discount
                                     ? parseFloat(values.discount).toFixed(2)
@@ -589,31 +810,11 @@ export default function EditCashRequest(props: CashId) {
                                 </div>
                               </div>
 
-                              {/* <div>
-                                <strong>VAT %:</strong>
-                                <div className="w-full p-2 border">
-                                  {values.cash_requisition_items
-                                    .reduce(
-                                      (acc, item) =>
-                                        acc +
-                                        (parseFloat(
-                                          item.vat_percentage || "0"
-                                        ) /
-                                          100) *
-                                          (item.quantity * item.unit_price ||
-                                            0),
-                                      0
-                                    )
-                                    .toFixed(2)}{" "}
-                                  ₱
-                                </div>
-                              </div> */}
                               <div>
-                                <strong>VAT %:</strong>
-                                <div className="w-full p-2 border">
+                                <strong>VAT Amount:</strong>
+                                <div className="w-full p-2 border border-gray-300 rounded-md shadow-sm">
                                   ₱
                                   {(() => {
-                                    // Calculate the total before discount
                                     const totalBeforeDiscount =
                                       values.cash_requisition_items.reduce(
                                         (acc, item) =>
@@ -622,46 +823,26 @@ export default function EditCashRequest(props: CashId) {
                                             0),
                                         0
                                       );
-
-                                    // Subtract the discount from the total
                                     const discountAmount = parseFloat(
                                       values.discount || "0"
                                     );
                                     const discountedTotal =
                                       totalBeforeDiscount - discountAmount;
-
-                                    // Apply VAT from the input field to the discounted total
                                     const vatPercentage = parseFloat(
                                       values.vat_percentage || "0"
                                     );
                                     const vatAmount =
                                       (vatPercentage / 100) * discountedTotal;
-
                                     return vatAmount.toFixed(2); // Display VAT amount
-                                  })()}{" "}
+                                  })()}
                                 </div>
                               </div>
 
                               <div>
-                                <strong>Less EWT %:</strong>
-                                <div className="w-full p-2 border">
-                                  {/* {values.cash_requisition_items
-                                    .reduce(
-                                      (acc, item) =>
-                                        acc +
-                                        (parseFloat(
-                                          item.less_ewt || "0"
-                                        ) /
-                                          100) *
-                                          (item.quantity * item.unit_price ||
-                                            0),
-                                      0
-                                    )
-                                    .toFixed(2)}{" "}
-                                  ₱ */}
+                                <strong>EWT Amount:</strong>
+                                <div className="w-full p-2 border border-gray-300 rounded-md shadow-sm">
                                   ₱
                                   {(() => {
-                                    // Calculate the total before discount
                                     const totalBeforeDiscount =
                                       values.cash_requisition_items.reduce(
                                         (acc, item) =>
@@ -670,29 +851,25 @@ export default function EditCashRequest(props: CashId) {
                                             0),
                                         0
                                       );
-
-                                    // Subtract the discount from the total
                                     const discountAmount = parseFloat(
                                       values.discount || "0"
                                     );
                                     const discountedTotal =
                                       totalBeforeDiscount - discountAmount;
-
-                                    // Apply EWT from the input field to the discounted total
                                     const ewtPercentage = parseFloat(
                                       values.less_ewt || "0"
                                     );
                                     const ewtAmount =
                                       (ewtPercentage / 100) * discountedTotal;
-
                                     return ewtAmount.toFixed(2); // Display EWT amount
-                                  })()}{" "}
+                                  })()}
                                 </div>
                               </div>
-
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                               <div>
                                 <strong>Total:</strong>
-                                <div className="w-full p-2 border">
+                                <div className="w-full p-2 border border-gray-300 rounded-md shadow-sm">
                                   ₱
                                   {values.cash_requisition_items
                                     .reduce(
@@ -707,111 +884,9 @@ export default function EditCashRequest(props: CashId) {
 
                               <div>
                                 <strong>Grand Total:</strong>
-                                <div className="w-full p-2 border">
-                                  {/* ₱
-                                  {(() => {
-                                    
-                                    const totalBeforeDiscount =
-                                      values.cash_requisition_items.reduce(
-                                        (acc, item) =>
-                                          acc +
-                                          (item.quantity * item.unit_price ||
-                                            0),
-                                        0
-                                      );
-
-                                   
-                                    const discountAmount = parseFloat(
-                                      values.discount || "0"
-                                    );
-
-                                    const discountedTotal =
-                                      totalBeforeDiscount - discountAmount;
-
-                                   
-                                    const vatAmount =
-                                      values.cash_requisition_items.reduce(
-                                        (acc, item) =>
-                                          acc +
-                                          (parseFloat(
-                                            item.vat_percentage || "0"
-                                          ) /
-                                            100) *
-                                            (item.quantity * item.unit_price ||
-                                              0),
-                                        0
-                                      );
-
-                                    const ewtAmount =
-                                      values.cash_requisition_items.reduce(
-                                        (acc, item) =>
-                                          acc +
-                                          (parseFloat(
-                                            item.less_ewt || "0"
-                                          ) /
-                                            100) *
-                                            (item.quantity * item.unit_price ||
-                                              0),
-                                        0
-                                      );
-
-                                  
-                                    return (
-                                      discountedTotal +
-                                      vatAmount -
-                                      ewtAmount
-                                    ).toFixed(2);
-                                  })()} */}
-                                  {/* ₱
-                                  {(() => {
-                                   
-                                    const totalBeforeDiscount =
-                                      values.cash_requisition_items.reduce(
-                                        (acc, item) =>
-                                          acc +
-                                          (item.quantity * item.unit_price ||
-                                            0),
-                                        0
-                                      );
-
-                                  
-                                    const discountAmount = parseFloat(
-                                      values.discount || "0"
-                                    );
-                                    const discountedTotal =
-                                      totalBeforeDiscount - discountAmount;
-
-                                    
-                                    const vatPercentage = parseFloat(
-                                      values.vat_percentage || "0"
-                                    );
-                                    const vatAmount =
-                                      (vatPercentage / 100) * discountedTotal;
-
-                                    
-                                    const ewtAmount =
-                                      values.cash_requisition_items.reduce(
-                                        (acc, item) =>
-                                          acc +
-                                          (parseFloat(
-                                            item.less_ewt || "0"
-                                          ) /
-                                            100) *
-                                            (item.quantity * item.unit_price ||
-                                              0),
-                                        0
-                                      );
-
-                                   
-                                    return (
-                                      discountedTotal +
-                                      vatAmount -
-                                      ewtAmount
-                                    ).toFixed(2);
-                                  })()} */}
+                                <div className="w-full p-2 border border-gray-300 rounded-md shadow-sm">
                                   ₱
                                   {(() => {
-                                    // calculate the total before discount
                                     const totalBeforeDiscount =
                                       values.cash_requisition_items.reduce(
                                         (acc, item) =>
@@ -820,41 +895,32 @@ export default function EditCashRequest(props: CashId) {
                                             0),
                                         0
                                       );
-
-                                    // subtract the discount from the total
                                     const discountAmount = parseFloat(
                                       values.discount || "0"
                                     );
                                     const discountedTotal =
                                       totalBeforeDiscount - discountAmount;
-
-                                    // vat from the input field to the discounted total
                                     const vatPercentage = parseFloat(
                                       values.vat_percentage || "0"
                                     );
                                     const vatAmount =
                                       (vatPercentage / 100) * discountedTotal;
-
-                                    // apply ewt from the input field to the discounted total
                                     const ewtPercentage = parseFloat(
                                       values.less_ewt || "0"
                                     );
                                     const ewtAmount =
                                       (ewtPercentage / 100) * discountedTotal;
-
-                                    // grand Total after discount, VAT, and EWT
                                     const grandTotal =
                                       discountedTotal + vatAmount - ewtAmount;
-
                                     return grandTotal.toFixed(2); // Display Grand Total
                                   })()}
                                 </div>
                               </div>
                             </div>
                           </div>
-                        )}
-                      </FieldArray>
-                    </div>
+                        </div>
+                      )}
+                    </FieldArray>
                   </div>
 
                   <div className="modal-action">

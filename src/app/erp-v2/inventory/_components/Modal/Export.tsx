@@ -67,7 +67,7 @@ export default function Export() {
     <>
       <div className="flex justify-end mb-4">
         <button
-          className="btn btn-info"
+          className="btn bg-white border border-black uppercase text-black"
           onClick={() => setShowRegisterModal(true)}
         >
           Export

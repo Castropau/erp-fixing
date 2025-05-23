@@ -1,7 +1,7 @@
 /** server actions */
 import { getCookies } from "@/server/getToken";
 
-interface User {
+export interface Users {
   id: number; // id as an integer
   full_name: string; // full_name as a string
   department: string; // department as a string
@@ -10,7 +10,7 @@ interface User {
   is_superuser: boolean;
 }
 
-export async function fetchUserList(): Promise<User[]> {
+export async function fetchUserList(): Promise<Users[]> {
   const token = await getCookies("token");
   const response = await fetch("http://192.168.0.249:8001/api/v1/users/", {
     headers: {

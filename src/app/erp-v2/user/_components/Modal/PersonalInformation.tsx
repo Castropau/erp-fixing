@@ -107,13 +107,16 @@ function PersonalInformation(props: PersonalInformationProps) {
 
   return (
     <div>
-      <button className="btn btn-xs" onClick={() => setShowEditModal(true)}>
+      <button
+        className="btn btn-xs bg-white"
+        onClick={() => setShowEditModal(true)}
+      >
         Personal Information
       </button>
       {showEditModal && (
         <dialog open className="modal mt-15">
           <div className="modal-box max-h-[80vh] overflow-y-auto">
-            <h3 className="font-bold text-lg">Edit User</h3>
+            {/* <h3 className="font-bold text-lg">Edit User</h3> */}
             {isUserLoading ? (
               <p>Loading user data...</p>
             ) : userError instanceof Error ? (
@@ -143,8 +146,8 @@ function PersonalInformation(props: PersonalInformationProps) {
                 }}
               >
                 {({ values, handleChange, handleBlur }) => (
-                  <Form className="py-4 text-start">
-                    <div className="mb-4">
+                  <Form className="py-4 text-start grid grid-cols-1 md:grid-cols-2 gap-1">
+                    {/* <div className="mb-1">
                       <label
                         htmlFor="edit_user_id"
                         className="block text-sm font-medium text-gray-700"
@@ -158,9 +161,9 @@ function PersonalInformation(props: PersonalInformationProps) {
                         readOnly
                         className="input input-bordered w-full"
                       />
-                    </div>
+                    </div> */}
 
-                    <div className="mb-4">
+                    <div className="mb-1">
                       <label
                         htmlFor="birth_date"
                         className="block text-sm font-medium text-gray-700"
@@ -177,7 +180,7 @@ function PersonalInformation(props: PersonalInformationProps) {
                       />
                     </div>
 
-                    <div className="mb-4">
+                    <div className="mb-1">
                       <label
                         htmlFor="first_name"
                         className="block text-sm font-medium text-gray-700"
@@ -194,7 +197,7 @@ function PersonalInformation(props: PersonalInformationProps) {
                       />
                     </div>
 
-                    <div className="mb-4">
+                    <div className="mb-1">
                       <label
                         htmlFor="last_name"
                         className="block text-sm font-medium text-gray-700"
@@ -211,7 +214,7 @@ function PersonalInformation(props: PersonalInformationProps) {
                       />
                     </div>
 
-                    <div className="mb-4">
+                    <div className="mb-1">
                       <label
                         htmlFor="middle_name"
                         className="block text-sm font-medium text-gray-700"
@@ -228,7 +231,7 @@ function PersonalInformation(props: PersonalInformationProps) {
                       />
                     </div>
 
-                    <div className="mb-4">
+                    {/* <div className="mb-1">
                       <label
                         htmlFor="sex"
                         className="block text-sm font-medium text-gray-700"
@@ -265,9 +268,9 @@ function PersonalInformation(props: PersonalInformationProps) {
                           </label>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
 
-                    <div className="mb-4">
+                    <div className="mb-1">
                       <label
                         htmlFor="contact_number"
                         className="block text-sm font-medium text-gray-700"
@@ -284,7 +287,7 @@ function PersonalInformation(props: PersonalInformationProps) {
                       />
                     </div>
 
-                    <div className="mb-4">
+                    <div className="mb-1">
                       <label
                         htmlFor="email"
                         className="block text-sm font-medium text-gray-700"
@@ -301,7 +304,7 @@ function PersonalInformation(props: PersonalInformationProps) {
                       />
                     </div>
 
-                    <div className="mb-4">
+                    <div className="mb-1">
                       <label
                         htmlFor="address"
                         className="block text-sm font-medium text-gray-700"
@@ -318,7 +321,7 @@ function PersonalInformation(props: PersonalInformationProps) {
                       />
                     </div>
 
-                    <div className="mb-4">
+                    <div className="mb-1">
                       <label
                         htmlFor="role"
                         className="block text-sm font-medium text-gray-700"
@@ -340,7 +343,7 @@ function PersonalInformation(props: PersonalInformationProps) {
                       </Field>
                     </div>
 
-                    <div className="mb-4">
+                    <div className="mb-1">
                       <label
                         htmlFor="department"
                         className="block text-sm font-medium text-gray-700"
@@ -362,7 +365,7 @@ function PersonalInformation(props: PersonalInformationProps) {
                       </Field>
                     </div>
 
-                    <div className="mb-4">
+                    <div className="mb-1">
                       <label
                         htmlFor="username"
                         className="block text-sm font-medium text-gray-700"
@@ -377,6 +380,44 @@ function PersonalInformation(props: PersonalInformationProps) {
                         // onChange={handleChange}
                         className="input input-bordered w-full"
                       />
+                    </div>
+                    <div className="mb-1">
+                      <label
+                        htmlFor="sex"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Sex
+                      </label>
+                      <div className="flex items-center space-x-4">
+                        <div>
+                          <Field
+                            type="radio"
+                            id="male"
+                            name="sex"
+                            // value={true}
+                            checked={values.sex === true}
+                            onChange={handleChange}
+                            className="radio"
+                          />
+                          <label htmlFor="male" className="text-sm ml-1">
+                            Male
+                          </label>
+                        </div>
+                        <div>
+                          <Field
+                            type="radio"
+                            id="female"
+                            name="sex"
+                            // value={false}
+                            checked={values.sex === false}
+                            onChange={handleChange}
+                            className="radio"
+                          />
+                          <label htmlFor="female" className="text-sm ml-1">
+                            Female
+                          </label>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="modal-action">

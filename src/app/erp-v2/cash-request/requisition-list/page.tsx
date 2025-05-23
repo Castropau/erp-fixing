@@ -136,11 +136,11 @@ function Page(props: PageProps) {
   });
 
   return (
-    <div className="p-4 sm:ml-64">
+    <div className="p-4">
       <div className="ml-auto">
         <Link href="/erp-v2/cash-request">
-          <button className="btn btn-info">
-            <IoMdArrowBack />
+          <button className="btn bg-white text-black border border-black uppercase">
+            {/* <IoMdArrowBack /> */}
             Back to Cash Request
           </button>
         </Link>
@@ -148,7 +148,7 @@ function Page(props: PageProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Item Table */}
-        <div className="p-4 rounded-lg shadow-md bg-gray-600">
+        <div className="p-4 rounded-lg shadow-md">
           <AddItem />
           {isItemsLoading ? (
             <div>Loading items...</div>
@@ -158,7 +158,7 @@ function Page(props: PageProps) {
                 {/* Search Input */}
                 <input
                   type="search"
-                  className="text-white w-full py-2 pl-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="text-black placeholder-gray-500 bg-white w-full py-2 pl-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="Search item"
                   value={searchTerm}
                   onChange={(e) => {
@@ -186,20 +186,23 @@ function Page(props: PageProps) {
                   </g>
                 </svg>
               </label>
-              <table className="min-w-full table-auto border-collapse">
+              <table className="min-w-full table-zebra border-collapse border border-black">
                 <thead>
-                  <tr className="text-blue-500">
-                    <th className="p-2 text-left">Item</th>
-                    <th className="p-2 text-left">Actions</th>
+                  <tr className="text-blue-500 border border-black bg-gray-300">
+                    <th className="p-2 text-center uppercase">Item</th>
+                    <th className="p-2 text-center uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentItemsRows?.map((item) => (
-                    <tr key={item.id} className="border-b text-white">
-                      <td className="p-2">{item.item}</td>
-                      <td className="p-2">
+                    <tr
+                      key={item.id}
+                      className="border-b text-black dark:text-white"
+                    >
+                      <td className="p-2 text-center">{item.item}</td>
+                      <td className="p-2 text-center">
                         <button
-                          className="btn btn-primary mr-2"
+                          className="uppercase px-3 py-1.5 mr-2 bg-white rounded-md font-medium text-blue-800 border border-blue-800"
                           onClick={() => {
                             setSelectedItem(item);
                             setIsItemModalOpen(true);
@@ -208,7 +211,7 @@ function Page(props: PageProps) {
                           Edit
                         </button>
                         <button
-                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md"
+                          className="bg-white uppercase  text-red-800 border border-red-800 px-3 py-1.5 rounded-md"
                           onClick={() => {
                             const confirmDelete = window.confirm(
                               "Are you sure you want to delete this item?"
@@ -247,7 +250,7 @@ function Page(props: PageProps) {
         </div>
 
         {/* Location Table */}
-        <div className="bg-gray-600 p-4 rounded-lg shadow-md">
+        <div className="p-4 rounded-lg shadow-md ">
           <AddUnit />
           {isUnitsLoading ? (
             <div>Loading locations...</div>
@@ -257,8 +260,8 @@ function Page(props: PageProps) {
                 {/* Search Input */}
                 <input
                   type="search"
-                  className="text-white w-full py-2 pl-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                  placeholder="Search location"
+                  className="text-black placeholder-gray-500 bg-white w-full py-2 pl-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  placeholder="Search unit"
                   value={searchTermLocation}
                   onChange={(e) => {
                     setSearchTermLocation(e.target.value);
@@ -286,20 +289,25 @@ function Page(props: PageProps) {
                   </g>
                 </svg>
               </label>
-              <table className="min-w-full table-auto border-collapse">
+              <table className="min-w-full table-zebra border-collapse border border-black">
                 <thead>
-                  <tr className="text-blue-500">
-                    <th className="p-2 text-left">Location</th>
-                    <th className="p-2 text-left">Actions</th>
+                  <tr className="text-blue-500 border border-black bg-gray-300">
+                    <th className="p-2 text-center uppercase">Location</th>
+                    <th className="p-2 text-center uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentUnitsRows?.map((location) => (
-                    <tr key={location.id} className="border-b text-white">
-                      <td className="p-2">{location.unit_of_measurement}</td>
-                      <td className="p-2">
+                    <tr
+                      key={location.id}
+                      className="border-b text-black dark:text-white"
+                    >
+                      <td className="p-2 text-center">
+                        {location.unit_of_measurement}
+                      </td>
+                      <td className="p-2 text-center">
                         <button
-                          className="btn btn-primary mr-2"
+                          className="uppercase px-3 py-1.5 mr-2 bg-white rounded-md font-medium text-blue-800 border border-blue-800"
                           onClick={() => {
                             setSelectedLocation(location);
                             setIsLocationModalOpen(true);
@@ -308,7 +316,7 @@ function Page(props: PageProps) {
                           Edit
                         </button>
                         <button
-                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md"
+                          className="bg-white uppercase  text-red-800 border border-red-800 px-3 py-1.5 rounded-md"
                           onClick={() => {
                             const confirmDelete = window.confirm(
                               "Are you sure you want to delete this location?"
@@ -377,7 +385,7 @@ function Page(props: PageProps) {
                 <div className="flex justify-between">
                   <button
                     type="button"
-                    className="btn btn-secondary"
+                    className="btn btn-secondary mr-1"
                     onClick={() => setIsItemModalOpen(false)}
                   >
                     Close
@@ -427,7 +435,7 @@ function Page(props: PageProps) {
                 <div className="flex justify-between">
                   <button
                     type="button"
-                    className="btn btn-secondary"
+                    className="btn btn-secondary mr-1"
                     onClick={() => setIsLocationModalOpen(false)}
                   >
                     Close

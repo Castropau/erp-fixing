@@ -2,12 +2,17 @@
 import { registerBom } from "@/api/bill_of_materials/addBom";
 import { BomId, fetchbomId } from "@/api/bill_of_materials/fetchBomId";
 import { fetchbomClient } from "@/api/bill_of_materials/fetchClients";
-import { fetchbomUser } from "@/api/bill_of_materials/fetchUsers";
+import { fetchEicUser, EicUser } from "@/api/bill_of_materials/fetchEic";
+import { fetchSicUser, SicUser } from "@/api/bill_of_materials/fetchSic";
 import { updateBomId, updatebomId } from "@/api/bill_of_materials/updateBomId";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa6";
+import ActiveNav1 from "../AddComponents/ActiveNav1";
+import ActiveNav2 from "../AddComponents/ActiveNav2";
+import ActiveNav3 from "../AddComponents/ActiveNav3";
+import ActiveNav4 from "../AddComponents/ActiveNav4";
 
 interface DeviceRow {
   item: string;
@@ -23,7 +28,7 @@ interface BomIds {
 const AddBom = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [activeNav, setActiveNav] = useState(1);
-  const [deviceRows, setDeviceRows] = useState<DeviceRow[]>([]);
+  // const [deviceRows, setDeviceRows] = useState<DeviceRow[]>([]);
 
   const queryClient = useQueryClient();
 
@@ -46,9 +51,18 @@ const AddBom = () => {
     isLoading: Uloading,
     error: uerror,
     data: udata,
-  } = useQuery<BomUser[]>({
-    queryKey: ["users"],
-    queryFn: fetchbomUser,
+  } = useQuery<SicUser[]>({
+    queryKey: ["users_sic"],
+    queryFn: fetchSicUser,
+  });
+
+  const {
+    isLoading: Eicloading,
+    error: Eicerror,
+    data: eicData,
+  } = useQuery<EicUser[]>({
+    queryKey: ["users_eic"],
+    queryFn: fetchEicUser,
   });
   const {
     isLoading: Clientloading,
@@ -651,6 +665,15 @@ const AddBom = () => {
       return updatedRows;
     });
   };
+  const [deviceRows, setDeviceRows] = useState([
+    {
+      item: "",
+      description: "",
+      quantity: "",
+      unit_of_measurement: "",
+      srp: 0,
+    },
+  ]);
 
   //   if (Rloading) {
   //     return <div>Loading...</div>;
@@ -662,11 +685,12 @@ const AddBom = () => {
   return (
     <div>
       <button
-        className="btn btn-primary text-white px-6 py-2 rounded-md shadow hover:bg-blue-600"
+        // className="btn btn-primary uppercase text-white px-6 py-2 rounded-md shadow hover:bg-blue-600"
+        className="btn bg-white text-black border border-black mr-4 uppercase"
         onClick={() => setShowEditModal(true)}
       >
-        <FaPlus />
-        Add
+        {/* <FaPlus /> */}
+        Add BOM
       </button>
 
       {showEditModal && (
@@ -679,9 +703,9 @@ const AddBom = () => {
             className="relative z-10 bg-white p-8 rounded-lg shadow-xl w-full max-w-5xl overflow-y-auto max-h-[90vh] dark:bg-gray-dark"
             onClick={(e) => e.stopPropagation()} // Prevent modal click from closing
           >
-            <h2 className="text-2xl font-semibold mb-6 text-center  dark:text-white">
+            {/* <h2 className="text-2xl font-semibold mb-6 text-center uppercase dark:text-white">
               Add BOM
-            </h2>
+            </h2> */}
             <Formik
               initialValues={{
                 input1: "",
@@ -830,7 +854,8 @@ const AddBom = () => {
             >
               {({ values, handleChange }) => (
                 <Form>
-                  <div className="grid grid-cols-2 gap-6 mb-6">
+                  {/* <div className="grid grid-cols-2 gap-3 mb-1 uppercase"> */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mb-1 gap-1">
                     {Object.keys(values).map((key, index) => {
                       const labelText = (() => {
                         switch (key) {
@@ -851,7 +876,7 @@ const AddBom = () => {
                           case "input8":
                             return "Project Site";
                           case "input9":
-                            return "First Header";
+                            return "Header";
                           default:
                             return `Input ${index + 1}`;
                         }
@@ -859,7 +884,7 @@ const AddBom = () => {
 
                       return (
                         <div key={key} className="flex flex-col">
-                          <label className="text-sm font-medium mb-2 dark:text-white">
+                          <label className="text-sm font-bold mb-1 dark:text-white">
                             {labelText}
                           </label>
 
@@ -878,7 +903,7 @@ const AddBom = () => {
                               name={key}
                               value={values[key]}
                               onChange={handleChange}
-                              className="input input-bordered w-full  rounded-md border border-gray-300 dark:bg-gray-800 dark:text-white"
+                              className="input input-bordered w-full rounded-md border border-gray-300 dark:bg-gray-800 dark:text-white"
                             >
                               <option value="">
                                 {key === "input3"
@@ -890,10 +915,16 @@ const AddBom = () => {
                                   : "Select EIC"}
                               </option>
 
-                              {key === "input3" || key === "input6"
+                              {key === "input3"
                                 ? udata?.map((user) => (
                                     <option key={user.id} value={user.id}>
                                       {user.full_name}
+                                    </option>
+                                  ))
+                                : key === "input6"
+                                ? eicData?.map((eic) => (
+                                    <option key={eic.id} value={eic.id}>
+                                      {eic.full_name}
                                     </option>
                                   ))
                                 : key === "input4"
@@ -920,7 +951,7 @@ const AddBom = () => {
                               name={key}
                               value={values[key]}
                               onChange={handleChange}
-                              className="input input-bordered w-full  rounded-md border border-gray-300 dark:bg-gray-800 dark:text-white"
+                              className="input input-bordered w-full rounded-md border border-gray-300 dark:bg-gray-800 dark:text-white"
                               placeholder={`Enter ${labelText}`}
                             />
                           )}
@@ -928,15 +959,15 @@ const AddBom = () => {
                       );
                     })}
                   </div>
-                  <button
+                  {/* <button
                     type="submit"
                     className="bg-blue-600 text-white px-6 py-2 rounded-md"
                   >
                     Save
-                  </button>
+                  </button> */}
                   {/* Navigation */}
-                  <div className="flex justify-between gap-2 mb-6">
-                    {["Devices", "Materials", "Labor", "General", "Save"].map(
+                  <div className="flex justify-between gap-2 mb-2">
+                    {["Devices", "Materials", "Labor", "General"].map(
                       (label, index) => (
                         <button
                           type="button"
@@ -955,987 +986,61 @@ const AddBom = () => {
                   </div>
                   {/* Devices Section */}
                   {activeNav === 1 && (
-                    <>
-                      <div className="space-y-6">
-                        <div className="flex justify-end gap-4">
-                          <button
-                            type="button"
-                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                            onClick={() =>
-                              setDeviceRows([
-                                ...deviceRows,
-                                {
-                                  item: "",
-                                  description: "",
-                                  quantity: "",
-                                  unit_of_measurement: "",
-                                  srp: 0,
-                                },
-                              ])
-                            }
-                          >
-                            Add Row
-                          </button>
-                          <button
-                            type="button"
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                            onClick={addHeader}
-                          >
-                            Add Header
-                          </button>
-                        </div>
-
-                        {/* Device Table */}
-                        <table className="table-auto w-full text-sm text-left  border">
-                          <thead className="bg-gray-100 dark:bg-gray-dark dark:text-white">
-                            <tr>
-                              <th className="px-4 py-2">Item</th>
-                              <th className="px-4 py-2">Description</th>
-                              <th className="px-4 py-2">Quantity</th>
-                              <th className="px-4 py-2">Unit of measurement</th>
-                              <th className="px-4 py-2">Unit Price</th>
-                              <th className="px-4 py-2">Amount</th>
-                              <th className="px-4 py-2">Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {deviceRows.map((row, index) => (
-                              <tr key={index}>
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="text"
-                                    value={row.item}
-                                    onChange={(e) =>
-                                      updateDeviceRow(
-                                        index,
-                                        "item",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full border p-1 rounded dark:border-white dark:text-white"
-                                  />
-                                </td>
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="text"
-                                    value={row.description}
-                                    onChange={(e) =>
-                                      updateDeviceRow(
-                                        index,
-                                        "description",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full border p-1 rounded dark:border-white dark:text-white"
-                                  />
-                                </td>
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="number"
-                                    value={row.quantity}
-                                    onChange={(e) => {
-                                      const updatedQuantity = parseFloat(
-                                        e.target.value
-                                      );
-                                      const updatedTotalAmount =
-                                        updatedQuantity * row.srp; // Recalculate total_amount based on updated quantity
-                                      updateDeviceRow(
-                                        index,
-                                        "quantity",
-                                        updatedQuantity
-                                      );
-                                      updateDeviceRow(
-                                        index,
-                                        "total_amount",
-                                        updatedTotalAmount
-                                      ); // Update the total_amount field
-                                    }}
-                                    className="w-full border p-1 rounded dark:border-white dark:text-white"
-                                  />
-                                </td>
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="text"
-                                    value={row.unit_of_measurement}
-                                    onChange={(e) =>
-                                      updateDeviceRow(
-                                        index,
-                                        "unit_of_measurement",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full border p-1 rounded dark:border-white dark:text-white"
-                                  />
-                                </td>
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="number"
-                                    value={row.srp} // Fetch only the srp (unit price) value from your API data
-                                    onChange={(e) => {
-                                      const updatedSrp = parseFloat(
-                                        e.target.value
-                                      );
-                                      const updatedTotalAmount =
-                                        row.quantity * updatedSrp; // Recalculate total_amount based on updated SRP
-                                      updateDeviceRow(index, "srp", updatedSrp);
-                                      updateDeviceRow(
-                                        index,
-                                        "total_amount",
-                                        updatedTotalAmount
-                                      ); // Update total_amount
-                                    }}
-                                    className="w-full border p-1 rounded dark:border-white dark:text-white"
-                                  />
-                                </td>
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="number"
-                                    value={row.total_amount} // Display total_amount as calculated
-                                    onChange={(e) => {
-                                      // If you want to allow reverse calculation, implement logic here
-                                      // Optionally: Recalculate quantity or srp based on the total amount
-                                    }}
-                                    readOnly // Optional: Make it readonly or editable depending on your requirements
-                                    className="w-full border p-1 rounded bg-gray-100 dark:bg-gray-dark dark:text-white"
-                                  />
-                                </td>
-
-                                <td className="px-4 py-2">
-                                  <button
-                                    className="bg-red-500 text-white px-2 py-1 rounded"
-                                    onClick={() => removeDeviceRow(index)}
-                                  >
-                                    Remove
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                        {newHeaders.map((header, headerIndex) => (
-                          <tr key={headerIndex}>
-                            <td colSpan={6}>
-                              <div className="border p-4 bg-gray-50 rounded space-y-4 mt-4 dark:bg-gray-dark">
-                                <input
-                                  type="text"
-                                  placeholder="Header Title"
-                                  value={header.title}
-                                  onChange={(e) =>
-                                    updateNewHeaderTitle(
-                                      headerIndex,
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full p-2 border rounded dark:text-white"
-                                />
-
-                                {header.rows.map((row, rowIndex) => (
-                                  <div
-                                    key={rowIndex}
-                                    className="grid grid-cols-6 gap-2 dark:text-white"
-                                  >
-                                    {[
-                                      "item",
-                                      "description",
-                                      "quantity",
-                                      "unit_of_measurement",
-                                      "srp",
-                                    ].map((field) => (
-                                      <input
-                                        key={field}
-                                        type="text"
-                                        placeholder={field}
-                                        value={row[field as keyof DeviceRow]}
-                                        onChange={(e) =>
-                                          updateNewHeaderRow(
-                                            headerIndex,
-                                            rowIndex,
-                                            field as keyof DeviceRow,
-                                            e.target.value
-                                          )
-                                        }
-                                        className="p-2 border rounded"
-                                      />
-                                    ))}
-                                    <button
-                                      className="bg-red-400 text-white px-2 py-1 rounded"
-                                      onClick={() =>
-                                        removeRowFromNewHeader(
-                                          headerIndex,
-                                          rowIndex
-                                        )
-                                      }
-                                    >
-                                      Remove
-                                    </button>
-                                  </div>
-                                ))}
-
-                                <div className="flex justify-between items-center">
-                                  <button
-                                    type="button"
-                                    className="bg-green-500 text-white px-4 py-2 rounded"
-                                    onClick={() =>
-                                      addRowToNewHeader(headerIndex)
-                                    }
-                                  >
-                                    Add Row
-                                  </button>
-
-                                  <div className="space-x-2 flex items-center">
-                                    <span className="text-sm font-semibold dark:text-white">
-                                      Subtotal: $
-                                      {getNewHeaderSubtotal(
-                                        header.rows
-                                      ).toFixed(2)}
-                                    </span>
-                                    {/* <button
-                                      className="bg-blue-600 text-white px-4 py-2 rounded"
-                                      onClick={() => saveNewHeader(headerIndex)}
-                                    >
-                                      Save Header
-                                    </button> */}
-                                    <button
-                                      className="bg-gray-500 text-white px-4 py-2 rounded"
-                                      onClick={() =>
-                                        cancelNewHeader(headerIndex)
-                                      }
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </div>
-
-                      <div className="text-right text-xl font-bold mt-6 dark:text-white">
-                        Total Amount: ${getTotalAmountIncludingNew().toFixed(2)}
-                      </div>
-                    </>
+                    <ActiveNav1
+                      deviceRows={deviceRows}
+                      setDeviceRows={setDeviceRows}
+                      newHeaders={newHeaders}
+                      addHeader={addHeader}
+                      updateNewHeaderTitle={updateNewHeaderTitle}
+                      updateNewHeaderRow={updateNewHeaderRow}
+                      addRowToNewHeader={addRowToNewHeader}
+                      removeRowFromNewHeader={removeRowFromNewHeader}
+                      cancelNewHeader={cancelNewHeader}
+                      getNewHeaderSubtotal={getNewHeaderSubtotal}
+                    />
                   )}
                   {activeNav === 2 && (
-                    <>
-                      <div className="space-y-6">
-                        <div className="flex justify-end gap-4">
-                          {/* <button
-                            type="button"
-                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                            onClick={() =>
-                              setDeviceRows2([
-                                ...deviceRows2,
-                                {
-                                  item: "",
-                                  description: "",
-                                  quantity: "",
-                                  unit_of_measurement: "",
-                                  srp: 0,
-                                },
-                              ])
-                            }
-                          >
-                            Add Row
-                          </button> */}
-                          <button
-                            type="button"
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                            onClick={addHeader2}
-                          >
-                            Add Header
-                          </button>
-                        </div>
-
-                        {/* Device Table */}
-                        <table className="table-auto w-full text-sm text-left  border">
-                          <thead className="bg-gray-100 dark:bg-gray-dark dark:text-white">
-                            <tr>
-                              <th className="px-4 py-2">Item2</th>
-                              <th className="px-4 py-2">Description</th>
-                              <th className="px-4 py-2">Quantity</th>
-                              <th className="px-4 py-2">Unit Price</th>
-                              <th className="px-4 py-2">Amount</th>
-                              <th className="px-4 py-2">Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {deviceRows2.map((row, idx) => (
-                              <tr key={idx}>
-                                {Object.keys(row).map((field) => (
-                                  <td key={field} className="px-4 py-2">
-                                    {row[field as keyof DeviceRow]}
-                                  </td>
-                                ))}
-                                <td className="px-4 py-2">
-                                  <button
-                                    className="bg-red-500 text-white px-3 py-1 rounded"
-                                    onClick={() => removeDeviceRow2(idx)}
-                                  >
-                                    Remove
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-
-                        {/* New Header Forms */}
-                        {newHeaders2.map((header, headerIndex) => (
-                          <tr key={headerIndex}>
-                            <td colSpan={6}>
-                              <div className="border p-4 bg-gray-50 rounded space-y-4 mt-4 dark:text-white dark:bg-gray-dark">
-                                <label htmlFor="">header title</label>
-                                <input
-                                  type="text"
-                                  placeholder="Header Title"
-                                  value={header.title}
-                                  onChange={(e) =>
-                                    updateNewHeaderTitle2(
-                                      headerIndex,
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full p-2 border rounded"
-                                />
-
-                                {header.rows.map((row, rowIndex) => (
-                                  <div
-                                    key={rowIndex}
-                                    className="grid grid-cols-6 gap-2 mb-4"
-                                  >
-                                    {[
-                                      { key: "item", label: "Item" },
-                                      {
-                                        key: "description",
-                                        label: "Description",
-                                      },
-                                      { key: "quantity", label: "Quantity" },
-                                      {
-                                        key: "unit_of_measurement",
-                                        label: "Unit of Measurement",
-                                      },
-                                      { key: "srp", label: "SRP" },
-                                    ].map(({ key, label }) => (
-                                      <div key={key} className="flex flex-col">
-                                        <label className="text-xs  mb-1">
-                                          {label}
-                                        </label>
-                                        <input
-                                          type="text"
-                                          placeholder={label}
-                                          value={row[key as keyof DeviceRow]}
-                                          onChange={(e) =>
-                                            updateNewHeaderRow2(
-                                              headerIndex,
-                                              rowIndex,
-                                              key as keyof DeviceRow,
-                                              e.target.value
-                                            )
-                                          }
-                                          className="p-2 border rounded"
-                                        />
-                                      </div>
-                                    ))}
-                                    <div className="flex items-end">
-                                      <button
-                                        className="bg-red-400 text-white px-2 py-1 rounded"
-                                        onClick={() =>
-                                          removeRowFromNewHeader2(
-                                            headerIndex,
-                                            rowIndex
-                                          )
-                                        }
-                                      >
-                                        Remove
-                                      </button>
-                                    </div>
-                                  </div>
-                                ))}
-
-                                <div className="flex justify-between items-center">
-                                  <button
-                                    type="button"
-                                    className="bg-green-500 text-white px-4 py-2 rounded"
-                                    onClick={() =>
-                                      addRowToNewHeader2(headerIndex)
-                                    }
-                                  >
-                                    Add Row
-                                  </button>
-
-                                  <div className="space-x-2 flex items-center">
-                                    <span className="text-sm font-semibold ">
-                                      Subtotal: $
-                                      {getNewHeaderSubtotal2(
-                                        header.rows
-                                      ).toFixed(2)}
-                                    </span>
-                                    {/* <button
-                                      className="bg-blue-600 text-white px-4 py-2 rounded"
-                                      onClick={() =>
-                                        saveNewHeader2(headerIndex)
-                                      }
-                                    >
-                                      Save Header
-                                    </button> */}
-                                    <button
-                                      className="bg-gray-500 text-white px-4 py-2 rounded"
-                                      onClick={() =>
-                                        cancelNewHeader2(headerIndex)
-                                      }
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </div>
-                      <div className="text-right text-xl font-bold mt-6">
-                        Total Amount: $
-                        {getTotalAmountIncludingNew2().toFixed(2)}
-                      </div>
-                    </>
+                    <ActiveNav2
+                      deviceRows2={deviceRows2}
+                      setDeviceRows2={setDeviceRows2}
+                      newHeaders2={newHeaders2}
+                      addHeader2={addHeader2}
+                      updateNewHeaderTitle2={updateNewHeaderTitle2}
+                      updateNewHeaderRow2={updateNewHeaderRow2}
+                      addRowToNewHeader2={addRowToNewHeader2}
+                      removeRowFromNewHeader2={removeRowFromNewHeader2}
+                      cancelNewHeader2={cancelNewHeader2}
+                      getNewHeaderSubtotal={getNewHeaderSubtotal}
+                    />
                   )}
                   {activeNav === 3 && (
-                    <>
-                      <div className="space-y-6">
-                        <div className="flex justify-end gap-4">
-                          <button
-                            type="button"
-                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                            onClick={() =>
-                              setDeviceRows3([
-                                ...deviceRows3,
-                                {
-                                  item: "",
-                                  description: "",
-                                  quantity: "",
-                                  unit_of_measurement: "",
-                                  srp: 0,
-                                },
-                              ])
-                            }
-                          >
-                            Add Row
-                          </button>
-                          <button
-                            type="button"
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                            onClick={addHeader3}
-                          >
-                            Add Header
-                          </button>
-                        </div>
-
-                        {/* Device Table */}
-                        <table className="table-auto w-full text-sm text-left  border">
-                          <thead className="bg-gray-100 dark:bg-gray-dark dark:text-white">
-                            <tr>
-                              <th className="px-4 py-2">Item3</th>
-                              <th className="px-4 py-2">Description</th>
-                              {/* <th className="px-4 py-2">srp</th> */}
-                              <th className="px-4 py-2">Quantity</th>
-                              <th className="px-4 py-2">Unit Price</th>
-                              <th className="px-4 py-2">Amount</th>
-                              <th className="px-4 py-2">Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {deviceRows3.map((row, index) => (
-                              <tr key={index} className="dark:text-white ">
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="text"
-                                    value={row.item}
-                                    onChange={(e) =>
-                                      updateDeviceRow3(
-                                        index,
-                                        "item",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full border p-1 rounded"
-                                  />
-                                </td>
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="text"
-                                    value={row.description}
-                                    onChange={(e) =>
-                                      updateDeviceRow3(
-                                        index,
-                                        "description",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full border p-1 rounded"
-                                  />
-                                </td>
-                                {/* <td className="px-4 py-2">
-                                  <input
-                                    type="text"
-                                    value={row.srp}
-                                    onChange={(e) =>
-                                      updateDeviceRow3(
-                                        index,
-                                        "srp",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full border p-1 rounded"
-                                  />
-                                </td> */}
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="number"
-                                    value={row.quantity}
-                                    onChange={(e) => {
-                                      const quantity = e.target.value;
-                                      const amount = (
-                                        parseFloat(quantity) *
-                                        parseFloat(row.unitPrice || "0")
-                                      ).toFixed(2);
-                                      updateDeviceRow3(
-                                        index,
-                                        "quantity",
-                                        quantity
-                                      );
-                                      updateDeviceRow3(index, "amount", amount);
-                                    }}
-                                    className="w-full border p-1 rounded"
-                                  />
-                                </td>
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="number"
-                                    value={row.unit_of_measurement || ""}
-                                    onChange={(e) => {
-                                      const unitPrice = e.target.value;
-                                      const amount = (
-                                        parseFloat(row.quantity || "0") *
-                                        parseFloat(unitPrice)
-                                      ).toFixed(2);
-                                      updateDeviceRow3(
-                                        index,
-                                        "unit_of_measurement",
-                                        unitPrice
-                                      );
-                                      updateDeviceRow3(index, "amount", amount);
-                                    }}
-                                    className="w-full border p-1 rounded"
-                                  />
-                                </td>
-                                <td className="px-4 py-2">
-                                  <input
-                                    type="text"
-                                    value={row.amount}
-                                    readOnly
-                                    className="w-full border p-1 rounded bg-gray-100 dark:bg-gray-dark "
-                                  />
-                                </td>
-                                <td className="px-4 py-2">
-                                  <button
-                                    className="bg-red-500 text-white px-2 py-1 rounded"
-                                    onClick={() => removeDeviceRow3(index)}
-                                  >
-                                    Remove
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-
-                        {/* New Header Forms */}
-                        {newHeaders3.map((header, headerIndex) => (
-                          <div
-                            key={headerIndex}
-                            className="border p-4 bg-gray-50 rounded space-y-4 mt-4 dark:bg-gray-dark dark:text-white"
-                          >
-                            <input
-                              type="text"
-                              placeholder="Header Title"
-                              value={header.title}
-                              onChange={(e) =>
-                                updateNewHeaderTitle3(
-                                  headerIndex,
-                                  e.target.value
-                                )
-                              }
-                              className="w-full p-2 border rounded"
-                            />
-
-                            {header.rows.map((row, rowIndex) => (
-                              <div
-                                key={rowIndex}
-                                className="grid grid-cols-6 gap-2"
-                              >
-                                {[
-                                  "item",
-                                  "description",
-                                  "quantity",
-                                  "unit_of_measurement",
-                                  "amount",
-                                ].map((field) => (
-                                  <input
-                                    key={field}
-                                    type="text"
-                                    placeholder={field}
-                                    value={row[field as keyof DeviceRow]}
-                                    onChange={(e) =>
-                                      updateNewHeaderRow3(
-                                        headerIndex,
-                                        rowIndex,
-                                        field as keyof DeviceRow,
-                                        e.target.value
-                                      )
-                                    }
-                                    className="p-2 border rounded"
-                                  />
-                                ))}
-                                <button
-                                  className="bg-red-400 text-white px-2 py-1 rounded"
-                                  onClick={() =>
-                                    removeRowFromNewHeader3(
-                                      headerIndex,
-                                      rowIndex
-                                    )
-                                  }
-                                >
-                                  Remove
-                                </button>
-                              </div>
-                            ))}
-
-                            <div className="flex justify-between items-center">
-                              <button
-                                className="bg-green-500 text-white px-4 py-2 rounded"
-                                onClick={() => addRowToNewHeader3(headerIndex)}
-                              >
-                                Add Row
-                              </button>
-
-                              <div className="space-x-2 flex items-center">
-                                <span className="text-sm font-semibold">
-                                  Subtotal: $
-                                  {getNewHeaderSubtotal3(header.rows).toFixed(
-                                    2
-                                  )}
-                                </span>
-                                <button
-                                  className="bg-blue-600 text-white px-4 py-2 rounded"
-                                  onClick={() => saveNewHeader3(headerIndex)}
-                                >
-                                  Save Header
-                                </button>
-                                <button
-                                  className="bg-gray-500 text-white px-4 py-2 rounded"
-                                  onClick={() => cancelNewHeader3(headerIndex)}
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="text-right text-xl font-bold mt-6 dark:text-white">
-                        Total Amount: $
-                        {getTotalAmountIncludingNew3().toFixed(2)}
-                      </div>
-                    </>
+                    <ActiveNav3
+                      deviceRows3={deviceRows3}
+                      setDeviceRows3={setDeviceRows3}
+                      newHeaders3={newHeaders3}
+                      addHeader3={addHeader3}
+                      updateNewHeaderTitle3={updateNewHeaderTitle3}
+                      updateNewHeaderRow3={updateNewHeaderRow3}
+                      addRowToNewHeader3={addRowToNewHeader3}
+                      removeRowFromNewHeader3={removeRowFromNewHeader3}
+                      cancelNewHeader3={cancelNewHeader3}
+                      getNewHeaderSubtotal={getNewHeaderSubtotal}
+                    />
                   )}
                   {/* Unit Price{" "} */}
                   {activeNav === 4 && (
-                    <>
-                      <div className="space-y-6">
-                        <div className="flex justify-end gap-4">
-                          <button
-                            type="button"
-                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                            onClick={() =>
-                              setDeviceRows4([
-                                ...deviceRows4,
-                                {
-                                  item: "",
-                                  description: "",
-                                  quantity: "",
-                                  unit_of_measurement: "",
-                                  amount: "",
-                                  subrows: [], // Add this!
-                                },
-                              ])
-                            }
-                          >
-                            Add Row
-                          </button>
-                          {/* <button
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                            onClick={addHeader4}
-                          >
-                            Add Header
-                          </button> */}
-                        </div>
-
-                        {/* Device Table */}
-                        <div className="overflow-x-auto">
-                          <table className="table-auto w-full text-sm text-left border">
-                            <thead className="bg-gray-100 dark:bg-gray-dark dark:text-white">
-                              <tr>
-                                <th className="px-4 py-2">Item4</th>
-                                <th className="px-4 py-2">Description</th>
-                                <th className="px-4 py-2">Quantity</th>
-                                <th className="px-4 py-2">Unit Price</th>
-                                <th className="px-4 py-2">Amount</th>
-                                <th className="px-4 py-2">Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {deviceRows4.map((row, index) => (
-                                <React.Fragment key={index}>
-                                  {/* Main Row */}
-                                  <tr className="dark:text-white">
-                                    <td className="px-4 py-2">
-                                      <input
-                                        type="text"
-                                        value={row.item}
-                                        onChange={(e) =>
-                                          updateDeviceRow4(
-                                            index,
-                                            "item",
-                                            e.target.value
-                                          )
-                                        }
-                                        className="w-full border p-1 rounded"
-                                      />
-                                    </td>
-                                    <td className="px-4 py-2">
-                                      <input
-                                        type="text"
-                                        value={row.description}
-                                        onChange={(e) =>
-                                          updateDeviceRow4(
-                                            index,
-                                            "description",
-                                            e.target.value
-                                          )
-                                        }
-                                        className="w-full border p-1 rounded"
-                                      />
-                                    </td>
-                                    <td className="px-4 py-2">
-                                      <input
-                                        type="number"
-                                        value={row.quantity}
-                                        onChange={(e) => {
-                                          const quantity = e.target.value;
-                                          const amount = (
-                                            parseFloat(quantity) *
-                                            parseFloat(
-                                              row.unit_of_measurement || "0"
-                                            )
-                                          ).toFixed(2);
-                                          updateDeviceRow4(
-                                            index,
-                                            "quantity",
-                                            quantity
-                                          );
-                                          updateDeviceRow4(
-                                            index,
-                                            "amount",
-                                            amount
-                                          );
-                                        }}
-                                        className="w-full border p-1 rounded"
-                                      />
-                                    </td>
-                                    <td className="px-4 py-2">
-                                      <input
-                                        type="text"
-                                        value={row.unit_of_measurement || ""}
-                                        onChange={(e) => {
-                                          const unitPrice = e.target.value;
-                                          const amount = (
-                                            parseFloat(row.quantity || "0") *
-                                            parseFloat(unitPrice)
-                                          ).toFixed(2);
-                                          updateDeviceRow4(
-                                            index,
-                                            "unit_of_measurement",
-                                            unitPrice
-                                          );
-                                          updateDeviceRow4(
-                                            index,
-                                            "amount",
-                                            amount
-                                          );
-                                        }}
-                                        className="w-full border p-1 rounded"
-                                      />
-                                    </td>
-                                    <td className="px-4 py-2">
-                                      <input
-                                        type="text"
-                                        value={row.amount}
-                                        readOnly
-                                        className="w-full border p-1 rounded bg-gray-100 dark:bg-gray-dark"
-                                      />
-                                    </td>
-                                    <td className="px-4 py-2">
-                                      <div className="flex flex-col gap-1">
-                                        <button
-                                          type="button"
-                                          className="bg-red-500 text-white px-2 py-1 rounded"
-                                          onClick={() =>
-                                            removeDeviceRow4(index)
-                                          }
-                                        >
-                                          Remove
-                                        </button>
-                                        <button
-                                          type="button"
-                                          className="bg-blue-500 text-white px-2 py-1 rounded"
-                                          onClick={() => addSubRow4(index)}
-                                        >
-                                          + Subrow
-                                        </button>
-                                      </div>
-                                    </td>
-                                  </tr>
-
-                                  {/* Subrows (if any) */}
-                                  {row.subrows?.map((subrow, subIndex) => (
-                                    <tr
-                                      key={subIndex}
-                                      className="dark:text-white"
-                                    >
-                                      <td className="px-4 py-2 pl-10">
-                                        {" "}
-                                        {/* Indentation for subrow */}
-                                        <input
-                                          type="text"
-                                          value={subrow.item}
-                                          onChange={(e) =>
-                                            updateSubRow4(
-                                              index,
-                                              subIndex,
-                                              "item",
-                                              e.target.value
-                                            )
-                                          }
-                                          className="w-full border p-1 rounded"
-                                        />
-                                      </td>
-                                      <td className="px-4 py-2">
-                                        <input
-                                          type="text"
-                                          value={subrow.description}
-                                          onChange={(e) =>
-                                            updateSubRow4(
-                                              index,
-                                              subIndex,
-                                              "description",
-                                              e.target.value
-                                            )
-                                          }
-                                          className="w-full border p-1 rounded"
-                                        />
-                                      </td>
-                                      <td className="px-4 py-2">
-                                        <input
-                                          type="number"
-                                          value={subrow.quantity}
-                                          onChange={(e) => {
-                                            const quantity = e.target.value;
-                                            const amount = (
-                                              parseFloat(quantity) *
-                                              parseFloat(
-                                                subrow.unit_of_measurement ||
-                                                  "0"
-                                              )
-                                            ).toFixed(2);
-                                            updateSubRow4(
-                                              index,
-                                              subIndex,
-                                              "quantity",
-                                              quantity
-                                            );
-                                            updateSubRow4(
-                                              index,
-                                              subIndex,
-                                              "amount",
-                                              amount
-                                            );
-                                          }}
-                                          className="w-full border p-1 rounded"
-                                        />
-                                      </td>
-                                      <td className="px-4 py-2">
-                                        <input
-                                          type="text"
-                                          value={
-                                            subrow.unit_of_measurement || ""
-                                          }
-                                          onChange={(e) => {
-                                            const unitPrice = e.target.value;
-                                            const amount = (
-                                              parseFloat(
-                                                subrow.quantity || "0"
-                                              ) * parseFloat(unitPrice)
-                                            ).toFixed(2);
-                                            updateSubRow4(
-                                              index,
-                                              subIndex,
-                                              "unit_of_measurement",
-                                              unitPrice
-                                            );
-                                            updateSubRow4(
-                                              index,
-                                              subIndex,
-                                              "amount",
-                                              amount
-                                            );
-                                          }}
-                                          className="w-full border p-1 rounded "
-                                        />
-                                      </td>
-                                      <td className="px-4 py-2">
-                                        <input
-                                          type="text"
-                                          value={subrow.amount}
-                                          readOnly
-                                          className="w-full border p-1 rounded bg-gray-100 dark:bg-gray-dark"
-                                        />
-                                      </td>
-                                      <td className="px-4 py-2">
-                                        <button
-                                          type="button"
-                                          className="bg-red-500 text-white px-2 py-1 rounded"
-                                          onClick={() =>
-                                            removeSubRow4(index, subIndex)
-                                          }
-                                        >
-                                          Remove Subrow
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </React.Fragment>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-
-                        <div className="text-right text-xl font-bold mt-6 dark:text-white">
-                          Total Amount: $
-                          {getTotalAmountIncludingNew4().toFixed(2)}
-                        </div>
-                      </div>
-                    </>
+                    <ActiveNav4
+                      deviceRows4={deviceRows4}
+                      setDeviceRows4={setDeviceRows4}
+                      newHeaders4={newHeaders4}
+                      addHeader4={addHeader4}
+                      updateNewHeaderTitle4={updateNewHeaderTitle4}
+                      updateNewHeaderRow4={updateNewHeaderRow4}
+                      addRowToNewHeader4={addRowToNewHeader4}
+                      removeRowFromNewHeader4={removeRowFromNewHeader4}
+                      cancelNewHeader4={cancelNewHeader4}
+                      getNewHeaderSubtotal4={getNewHeaderSubtotal4}
+                    />
                   )}
                   {/* Render Saved Headers */}
                   <div className="mt-6 space-y-4">
@@ -1999,7 +1104,7 @@ const AddBom = () => {
 
                         {/* Subtotal Display */}
                         <div className="text-right text-sm font-semibold text-gray-700 mt-2">
-                          Subtotal: $
+                          Subtotal: ₱
                           {getHeaderSubtotal4(header.rows).toFixed(2)}
                         </div>
 
@@ -2025,7 +1130,7 @@ const AddBom = () => {
                       //   onClick={handleSave}
                       type="submit"
                     >
-                      Save
+                      Submit
                     </button>
                   </div>
                 </Form>

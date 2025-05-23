@@ -77,10 +77,10 @@ export default function AddQuotations() {
     <>
       <div className="flex justify-start">
         <button
-          className="btn btn-info"
+          className="btn bg-white border border-black uppercase text-black"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaCirclePlus className="w-6 h-6 btn-info" />
+          {/* <FaCirclePlus className="w-6 h-6 btn-info" /> */}
           Add Quotations
         </button>
       </div>
@@ -89,7 +89,9 @@ export default function AddQuotations() {
       {showRegisterModal && (
         <dialog open className="modal backdrop-blur-sm mt-15">
           <div className="modal-box w-11/12 max-w-7xl max-h-[80vh] overflow-y-auto dark:bg-gray-dark">
-            <h3 className="font-bold text-lg">Create New Quotations</h3>
+            <h3 className="font-bold text-lg text-center uppercase">
+              Create New Quotations
+            </h3>
             <Formik
               initialValues={{
                 project: "",
@@ -128,7 +130,45 @@ export default function AddQuotations() {
               // onSubmit={handleSubmit}
               onSubmit={(values, { resetForm }) => {
                 registerQuotation(values);
-                resetForm();
+                resetForm({
+                  values: {
+                    project: "",
+                    project_name: "",
+                    contactPerson: "",
+                    delivery_address: "",
+                    client: 0,
+                    projectDate: "",
+                    remittedBy: "",
+                    receivedBy: "",
+                    tableRows: [
+                      {
+                        date: "",
+                        description: "",
+                        srp: "",
+                        quantity: "",
+                        total: 0,
+                        balance: "",
+                      },
+                    ],
+                    quotation_items: [
+                      {
+                        item: "",
+                        description: "",
+                        srp: "",
+                        quantity: "",
+                        total: 0,
+                        balance: "",
+                      },
+                    ],
+                    notes_assumptions: "",
+                    terms_conditions: "",
+                  },
+                });
+                setProjectName("");
+                setContactPerson("");
+                setAddress("");
+                setSelectedProject("");
+                setClient(0);
                 console.log(values);
               }}
             >
@@ -152,7 +192,10 @@ export default function AddQuotations() {
                         "contactPerson",
                         selectedClientDetails.contact_person || ""
                       );
-                      setFieldValue("client", selectedClientDetails.id || "");
+                      setFieldValue(
+                        "client",
+                        selectedClientDetails.client || ""
+                      );
                     }
                   }
                 }, [selectedProject, projects, setFieldValue]);
@@ -184,7 +227,7 @@ export default function AddQuotations() {
                       },
                     ].map((item) => (
                       <div key={item.name}>
-                        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                        <label className="uppercase block mb-2 text-sm font-bold text-gray-700 dark:text-white">
                           {item.label}
                         </label>
                         <Field
@@ -198,8 +241,8 @@ export default function AddQuotations() {
                     ))}
 
                     {/* Dropdown for Project Selection */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-white">
+                    <div className="mb-1">
+                      <label className="block text-sm font-bold uppercase text-gray-700 dark:text-white">
                         Company
                       </label>
                       <Field
@@ -223,9 +266,11 @@ export default function AddQuotations() {
 
                     {/* Project Details */}
                     {selectedProject && (
-                      <div className="space-y-4">
-                        <h4 className="font-semibold">Project Details</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-4 ">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 gap-2">
+                          {/* <h4 className="font-semibold">Project Details</h4> */}
+                          {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-2"> */}
+                          {/* <div className="flex flex-wrap gap-4"> */}
                           {[
                             {
                               label: "Contact Person",
@@ -234,8 +279,9 @@ export default function AddQuotations() {
                               placeholder: "Contact Person",
                             },
                             {
+                              label: "client",
                               name: "client",
-                              type: "hidden",
+                              type: "text",
                               placeholder: "client",
                             },
                             {
@@ -248,7 +294,7 @@ export default function AddQuotations() {
                             },
                           ].map((item) => (
                             <div key={item.name}>
-                              <label className="block mb-2 text-sm font-medium text-gray-700">
+                              <label className="uppercase block mb-2 text-sm font-bold text-gray-700">
                                 {item.label}
                               </label>
                               {item.type === "select" ? (
@@ -297,14 +343,14 @@ export default function AddQuotations() {
 
                     {/* Table for Adding Expenses */}
                     <div className="space-y-4">
-                      <h4 className="font-semibold">Expenses</h4>
+                      {/* <h4 className="font-semibold">Expenses</h4> */}
                       <FieldArray
                         name="quotation_items"
                         render={(arrayHelpers) => (
                           <div>
                             <table className="table-auto w-full border-collapse">
                               <thead>
-                                <tr>
+                                <tr className="uppercase">
                                   {[
                                     "# ITEM",
                                     "Description",
@@ -312,7 +358,10 @@ export default function AddQuotations() {
                                     "Quantity",
                                     "Total",
                                   ].map((header) => (
-                                    <th key={header} className="p-2 text-left">
+                                    <th
+                                      key={header}
+                                      className="p-2 text-center border border-black bg-gray-200"
+                                    >
                                       {header}
                                     </th>
                                   ))}
@@ -321,7 +370,7 @@ export default function AddQuotations() {
                               <tbody>
                                 {values.quotation_items.map((row, index) => (
                                   <tr key={index}>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         as="select"
                                         name={`quotation_items[${index}].item`} // Name it as client
@@ -375,7 +424,7 @@ export default function AddQuotations() {
                                       </Field>
                                     </td>
 
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="text"
                                         name={`quotation_items[${index}].description`}
@@ -384,7 +433,7 @@ export default function AddQuotations() {
                                       />
                                     </td>
 
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`quotation_items[${index}].srp`}
@@ -413,7 +462,7 @@ export default function AddQuotations() {
                                       />
                                     </td>
 
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`quotation_items[${index}].quantity`}
@@ -440,7 +489,7 @@ export default function AddQuotations() {
                                       />
                                     </td>
 
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`quotation_items[${index}].total`}
@@ -455,7 +504,8 @@ export default function AddQuotations() {
                                         onClick={() =>
                                           arrayHelpers.remove(index)
                                         }
-                                        className="btn btn-danger"
+                                        // className="btn btn-danger uppercase"
+                                        className="flex items-center gap-1 bg-white border border-red-800 text-red-800 px-3 py-1.5 rounded-md text-xs shadow transition duration-200 uppercase"
                                       >
                                         Remove
                                       </button>
@@ -477,7 +527,7 @@ export default function AddQuotations() {
                                   balance: "",
                                 })
                               }
-                              className="btn btn-info mt-4"
+                              className="btn bg-white mt-2 mb-2 text-black border border-black uppercase"
                             >
                               Add Row
                             </button>
@@ -488,7 +538,7 @@ export default function AddQuotations() {
 
                     {/* Total Row */}
                     <div className="flex justify-between py-2 border-t border-gray-300">
-                      <div className="ml-auto flex space-x-4 w-full">
+                      <div className="ml-auto flex space-x-4 w-full uppercase">
                         {/* Discount Input */}
                         <div className="flex flex-col w-1/4">
                           <label className="font-semibold">Discount</label>
@@ -518,7 +568,7 @@ export default function AddQuotations() {
                         </div>
 
                         {/* Sub Total */}
-                        <div className="flex flex-col w-1/4">
+                        <div className="flex flex-col w-1/4 ">
                           <label className="font-semibold">Sub Total</label>
                           <input
                             type="number"
@@ -541,13 +591,6 @@ export default function AddQuotations() {
                             className="bg-gray-200 border border-white dark:bg-gray-dark dark:text-white p-2 rounded-md w-full"
                           />
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Grand Total */}
-                    <div className="flex justify-between py-2 border-t border-gray-300">
-                      <div className="ml-auto flex space-x-4 w-full">
-                        {/* Grand Total */}
                         <div className="flex flex-col w-1/4">
                           <label className="font-semibold">Grand Total</label>
                           <input
@@ -565,26 +608,52 @@ export default function AddQuotations() {
                         </div>
                       </div>
                     </div>
-                    {/* Notes & Assumptions */}
-                    <div className="mt-6">
-                      <h4 className="font-semibold">Notes & Assumptions</h4>
-                      <Field
-                        as="textarea"
-                        name="notes_assumptions"
-                        className="bg-gray-50 dark:bg-gray-dark dark:text-white border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
-                        placeholder="Enter any notes or assumptions regarding this quotation"
-                      />
-                    </div>
 
-                    {/* Terms & Conditions */}
-                    <div className="mt-6">
-                      <h4 className="font-semibold">Terms & Conditions</h4>
-                      <Field
-                        as="textarea"
-                        name="terms_conditions"
-                        className="bg-gray-50 dark:bg-gray-dark dark:text-white border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
-                        placeholder="Enter terms and conditions for this quotation"
-                      />
+                    {/* Grand Total */}
+                    <div className="flex justify-between py-2 border-t border-gray-300 uppercase">
+                      <div className="ml-auto flex space-x-4 w-full">
+                        {/* Grand Total */}
+                        {/* <div className="flex flex-col w-1/4">
+                          <label className="font-semibold">Grand Total</label>
+                          <input
+                            type="number"
+                            value={(() => {
+                              const discountAmount =
+                                totalExpenses * (values.discount / 100) || 0;
+                              const vatAmount =
+                                totalExpenses * (values.vat / 100) || 0;
+                              return totalExpenses - discountAmount + vatAmount;
+                            })()}
+                            readOnly
+                            className="bg-gray-200 border border-white dark:bg-gray-dark dark:text-white p-2 rounded-md w-full"
+                          />
+                        </div> */}
+                      </div>
+                    </div>
+                    {/* Notes & Assumptions */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                      <div className="mt-1">
+                        <h4 className="font-semibold uppercase">
+                          Notes & Assumptions
+                        </h4>
+                        <Field
+                          as="textarea"
+                          name="notes_assumptions"
+                          className="bg-gray-50 dark:bg-gray-dark dark:text-white border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
+                          placeholder="Enter any notes or assumptions regarding this quotation"
+                        />
+                      </div>
+
+                      {/* Terms & Conditions */}
+                      <div className="mt-1 uppercase">
+                        <h4 className="font-semibold">Terms & Conditions</h4>
+                        <Field
+                          as="textarea"
+                          name="terms_conditions"
+                          className="bg-gray-50 dark:bg-gray-dark dark:text-white border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
+                          placeholder="Enter terms and conditions for this quotation"
+                        />
+                      </div>
                     </div>
 
                     {/* Submit and Cancel Buttons */}

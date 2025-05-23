@@ -101,18 +101,18 @@ export default function ViewQuo(props: QuotationId) {
     <>
       <div className="flex justify-start">
         <button
-          className="btn btn-info"
+          className="btn bg-white border border-blue-800 text-blue-800 uppercase"
           onClick={() => setShowRegisterModal(true)}
         >
-          <CiCirclePlus className="w-6 h-6 btn-info" />
+          {/* <CiCirclePlus className="w-6 h-6 btn-info" /> */}
           View
         </button>
       </div>
 
       {/* Registration Modal */}
       {showRegisterModal && (
-        <dialog open className="modal">
-          <div className="modal-box w-11/12 max-w-7xl">
+        <dialog open className="modal backdrop-blur-sm mt-10">
+          <div className="modal-box w-11/12 max-w-7xl overflow-y-auto max-h-[90vh] dark:bg-gray-dark">
             <div className="flex justify-between">
               <h3 className="font-bold text-lg">View Quotations</h3>
               {/* Toggle between CiEdit and CiCircleBan based on editability */}
@@ -207,14 +207,14 @@ export default function ViewQuo(props: QuotationId) {
                       },
                     ].map((item) => (
                       <div key={item.name}>
-                        <label className="block mb-2 text-sm font-medium text-gray-700">
+                        <label className="block mb-2 text-sm font-medium ">
                           {item.label}
                         </label>
                         <Field
                           type={item.type}
                           name={item.name}
                           placeholder={item.placeholder}
-                          className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                          className="bg-gray-50 border border-gray-300 dark:bg-gray-dark rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                           required
                           disabled={!isEditable} // Conditionally disable field based on edit mode
                         />
@@ -223,7 +223,7 @@ export default function ViewQuo(props: QuotationId) {
 
                     {/* Dropdown for Project Selection */}
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className="block text-sm font-medium ">
                         Company
                       </label>
                       <Field
@@ -249,42 +249,42 @@ export default function ViewQuo(props: QuotationId) {
                         <h4 className="font-semibold">Project Details</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                           <div>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                            <label className="block mb-2 text-sm font-medium ">
                               Contact person
                             </label>
                             <Field
                               type="text"
                               name="contact_person"
                               placeholder="Owner"
-                              className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                              className="bg-gray-50 border border-gray-300 dark:bg-gray-dark rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                               value={values.contact_person || ""} // Use Formik value
                               required
                               disabled={!isEditable} // Conditionally disable field based on edit mode
                             />
                           </div>
                           <div>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                            <label className="block mb-2 text-sm font-medium ">
                               Delivery address
                             </label>
                             <Field
                               type="text"
                               name="delivery_address"
                               placeholder="Enter delivery address"
-                              className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                              className="bg-gray-50 border border-gray-300 dark:bg-gray-dark rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                               value={values.delivery_address || ""} // Use Formik value
                               required
                               disabled={!isEditable} // Conditionally disable field based on edit mode
                             />
                           </div>
                           <div>
-                            <label className="block mb-2 text-sm font-medium text-gray-700">
+                            <label className="block mb-2 text-sm font-medium ">
                               address
                             </label>
                             <Field
                               type="text"
                               name="address"
                               placeholder="Enter address"
-                              className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                              className="bg-gray-50 border border-gray-300 dark:bg-gray-dark rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                               value={values.address || ""} // Use Formik value
                               required
                               disabled={!isEditable} // Conditionally disable field based on edit mode
@@ -325,7 +325,7 @@ export default function ViewQuo(props: QuotationId) {
                                         type="text"
                                         name={`quotation_items[${index}].item`}
                                         disabled={!isEditable}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                       />
                                     </td>
                                     <td className="p-2">
@@ -333,7 +333,7 @@ export default function ViewQuo(props: QuotationId) {
                                         type="text"
                                         name={`quotation_items[${index}].description`}
                                         disabled={!isEditable}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                       />
                                     </td>
                                     <td className="p-2">
@@ -341,7 +341,7 @@ export default function ViewQuo(props: QuotationId) {
                                         type="number"
                                         name={`quotation_items[${index}].srp`}
                                         disabled={!isEditable}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                       />
                                     </td>
                                     <td className="p-2">
@@ -349,7 +349,7 @@ export default function ViewQuo(props: QuotationId) {
                                         type="number"
                                         name={`quotation_items[${index}].quantity`}
                                         disabled={!isEditable}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                         onChange={(e) => {
                                           const quantity = parseFloat(
                                             e.target.value
@@ -375,7 +375,7 @@ export default function ViewQuo(props: QuotationId) {
                                         type="number"
                                         name={`quotation_items[${index}].total`}
                                         readOnly
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        className="bg-gray-50 border border-gray-300 dark:text-white dark:bg-gray-dark rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                       />
                                     </td>
                                     <td className="p-2">
@@ -428,7 +428,7 @@ export default function ViewQuo(props: QuotationId) {
                             type="number"
                             name="discount"
                             disabled={!isEditable}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                            className="bg-gray-50 border border-gray-300 dark:bg-gray-dark rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                             onChange={(e) => {
                               const discount = parseFloat(e.target.value) || 0;
                               setFieldValue("discount", discount);
@@ -443,7 +443,7 @@ export default function ViewQuo(props: QuotationId) {
                             type="number"
                             name="vat_value"
                             disabled={!isEditable}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                            className="bg-gray-50 border border-gray-300 dark:bg-gray-dark rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                             onChange={(e) => {
                               const vat = parseFloat(e.target.value);
                               setFieldValue("vat", vat);
@@ -458,7 +458,7 @@ export default function ViewQuo(props: QuotationId) {
                             type="number"
                             value={totalExpenses}
                             readOnly
-                            className="bg-gray-200 p-2 rounded-md w-full"
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-gray"
                           />
                         </div>
 
@@ -472,7 +472,7 @@ export default function ViewQuo(props: QuotationId) {
                               return totalExpenses * vat;
                             })()}
                             readOnly
-                            className="bg-gray-200 p-2 rounded-md w-full"
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-gray"
                           />
                         </div>
                       </div>
@@ -494,7 +494,7 @@ export default function ViewQuo(props: QuotationId) {
                               return totalExpenses - discountAmount + vatAmount;
                             })()}
                             readOnly
-                            className="bg-gray-200 p-2 rounded-md w-full"
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:border border-gray"
                           />
                         </div>
                       </div>
@@ -507,7 +507,7 @@ export default function ViewQuo(props: QuotationId) {
                         as="textarea"
                         name="notes_assumptions"
                         disabled={!isEditable}
-                        className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
+                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:border border-gray rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
                         placeholder="Enter any notes or assumptions regarding this quotation"
                       />
                     </div>
@@ -519,7 +519,7 @@ export default function ViewQuo(props: QuotationId) {
                         as="textarea"
                         name="terms_conditions"
                         disabled={!isEditable}
-                        className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
+                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:border border-gray rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
                         placeholder="Enter terms and conditions for this quotation"
                       />
                     </div>

@@ -25,8 +25,8 @@ export default function View(props: QuotationId) {
   const { id } = props;
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState("");
-  const [isEditable, setIsEditable] = useState(false); // State to control if inputs are editable or not
-  const [selectedClient, setSelectedClient] = useState<any>(null); // To store selected client details
+  const [isEditable, setIsEditable] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<any>(null);
 
   const queryClient = useQueryClient();
 
@@ -46,10 +46,9 @@ export default function View(props: QuotationId) {
   //   },
   // });
 
-  // Fetch project data based on dropdown selection
   const { data: projects } = useQuery({
     queryKey: ["clients"],
-    queryFn: fetchClientsList, // Assume fetchDepartmentsList is an API call to fetch departments (projects)
+    queryFn: fetchClientsList,
   });
 
   const {
@@ -62,13 +61,12 @@ export default function View(props: QuotationId) {
     queryFn: () => fetchQuotationDataById(id),
     enabled: !!id,
   });
-  // Handle form submission
   const { mutate: updatedView } = useMutation({
     mutationFn: (data: UpdateView) => updateView(id, data),
     onSuccess: () => {
       console.log("quotations updated successfully");
       queryClient.invalidateQueries({ queryKey: ["quotations", id] });
-      setShowRegisterModal(false); // Close the modal after successful update
+      setShowRegisterModal(false);
     },
     onError: (error) => {
       console.error("Error updating quotation:", error);
@@ -80,30 +78,51 @@ export default function View(props: QuotationId) {
     setFieldValue: any
   ) => {
     const value = e.target.value;
-    setSelectedProject(value); // Update the local state with the selected project
+    setSelectedProject(value);
 
-    // Find the selected client based on its ID and set the details (contact_person and delivery_address)
     const client = projects?.find((project) => project.id === parseInt(value));
     if (client) {
-      setSelectedClient(client); // Update the selected client in local state
-      setFieldValue("project", client); // Update Formik with the selected project
-      setFieldValue("contact_person", client.contact_person); // Update Formik with the contact person
-      setFieldValue("delivery_address", client.address); // Update Formik with the delivery address
+      setSelectedClient(client);
+      setFieldValue("project", client);
+      setFieldValue("contact_person", client.contact_person);
+      setFieldValue("delivery_address", client.address);
+      setFieldValue("client", client.client);
     }
   };
 
   const handleSubmit = (values: any) => {
     console.log(values);
   };
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex justify-center items-center space-x-2">
+  //       {/* Spinner */}
+  //       <div className="w-6 h-6 border-4 border-dashed border-gray-400 border-t-transparent rounded-full animate-spin dark:border-gray-200 dark:border-t-transparent"></div>
 
+  //       <span className="text-sm text-gray-700 dark:text-gray-300">
+  //         Loading...
+  //       </span>
+  //     </div>
+  //   );
+  // }
+  if (isLoading || !QuotationData || !QuotationData.client) {
+    return (
+      <div className="flex justify-center items-center space-x-2">
+        <div className="w-6 h-6 border-4 border-dashed border-gray-400 border-t-transparent rounded-full animate-spin dark:border-gray-200 dark:border-t-transparent"></div>
+        <span className="text-sm text-gray-700 dark:text-gray-300">
+          Loading...
+        </span>
+      </div>
+    );
+  }
   return (
     <>
       <div className="flex justify-start">
         <button
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow transition duration-200"
+          className="uppercase flex items-center gap-2 bg-white text-blue-800 border border-blue-800 px-4 py-2 rounded-md shadow transition duration-200"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaEye className="w-6 h-6 btn-info" />
+          {/* <FaEye className="w-6 h-6 btn-info" /> */}
           View
         </button>
       </div>
@@ -113,7 +132,9 @@ export default function View(props: QuotationId) {
         <dialog open className="modal mt-15 backdrop-blur-sm">
           <div className="modal-box w-11/12 max-w-7xl max-h-[80vh] overflow-y-auto dark:bg-gray-dark">
             <div className="flex justify-between">
-              <h3 className="font-bold text-lg">View Quotations</h3>
+              <h3 className="font-bold text-lg">
+                {QuotationData?.quotation_no}
+              </h3>
               {/* Toggle between CiEdit and CiCircleBan based on editability */}
               {isEditable ? (
                 <FaBan
@@ -140,6 +161,7 @@ export default function View(props: QuotationId) {
                 receivedBy: "",
                 contact_person: QuotationData?.client.contact_person || "", // Initially populate if available
                 delivery_address: QuotationData?.delivery_address || "",
+                client: QuotationData?.client || "",
                 quotation_items: QuotationData?.quotation_items.map((item) => ({
                   item: item.item || "",
                   description: item.description || "",
@@ -194,7 +216,7 @@ export default function View(props: QuotationId) {
                 );
 
                 return (
-                  <Form className="py-4">
+                  <Form className="py-1 uppercase">
                     {/* Project and Address Inputs */}
                     {[
                       {
@@ -205,7 +227,7 @@ export default function View(props: QuotationId) {
                       },
                     ].map((item) => (
                       <div key={item.name}>
-                        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                        <label className="block mb-2 text-sm text-gray-700 dark:text-white">
                           {item.label}
                         </label>
                         <Field
@@ -220,7 +242,7 @@ export default function View(props: QuotationId) {
                     ))}
 
                     {/* Dropdown for Project Selection */}
-                    <div className="mb-4">
+                    <div className="mb-1">
                       <label className="block text-sm font-medium text-gray-700 dark:text-white">
                         Company
                       </label>
@@ -243,9 +265,9 @@ export default function View(props: QuotationId) {
                     {/* Project Details */}
                     {/* {selectedProject && ( */}
                     {
-                      <div className="space-y-4">
-                        <h4 className="font-semibold">Project Details</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        {/* <h4 className="font-semibold">Project Details</h4> */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                           <div>
                             <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
                               Contact person
@@ -274,18 +296,32 @@ export default function View(props: QuotationId) {
                               disabled={!isEditable} // Conditionally disable field based on edit mode
                             />
                           </div>
+                          <div>
+                            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
+                              address
+                            </label>
+                            <Field
+                              type="text"
+                              name="client"
+                              placeholder="Enter delivery address"
+                              className="bg-gray-50 dark:bg-gray-dark dark:text-white border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                              value={values.client.address || ""} // Use Formik value
+                              required
+                              disabled={!isEditable} // Conditionally disable field based on edit mode
+                            />
+                          </div>
                         </div>
                       </div>
                     }
 
                     {/* Table for Adding Expenses */}
-                    <div className="space-y-4">
-                      <h4 className="font-semibold">Expenses</h4>
+                    <div className="space-y-5 mt-4">
+                      {/* <h4 className="font-semibold">Expenses</h4> */}
                       <FieldArray
                         name="quotation_items"
                         render={(arrayHelpers) => (
                           <div>
-                            <table className="table-auto w-full border-collapse">
+                            <table className="table-zebra w-full border-collapse">
                               <thead>
                                 <tr className="dark:text-white">
                                   {[
@@ -295,7 +331,10 @@ export default function View(props: QuotationId) {
                                     "Quantity",
                                     "Total",
                                   ].map((header) => (
-                                    <th key={header} className="p-2 text-left">
+                                    <th
+                                      key={header}
+                                      className="p-2 text-center bg-gray-200 border border-black"
+                                    >
                                       {header}
                                     </th>
                                   ))}
@@ -304,36 +343,36 @@ export default function View(props: QuotationId) {
                               <tbody>
                                 {values.quotation_items?.map((row, index) => (
                                   <tr key={index}>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="text"
                                         name={`quotation_items[${index}].item`}
                                         disabled={!isEditable}
-                                        className="dark:bg-gray-dark dark:text-white bg-gray-50 border  border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        className="dark:bg-gray-dark text-center dark:text-white bg-gray-50 border  border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="text"
                                         name={`quotation_items[${index}].description`}
                                         disabled={!isEditable}
-                                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        className="bg-gray-50 border text-center border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`quotation_items[${index}].srp`}
                                         disabled={!isEditable}
-                                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        className="bg-gray-50 border text-center border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`quotation_items[${index}].quantity`}
                                         disabled={!isEditable}
-                                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        className="bg-gray-50 border text-center border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                         onChange={(e) => {
                                           const quantity = parseFloat(
                                             e.target.value
@@ -354,22 +393,23 @@ export default function View(props: QuotationId) {
                                         }}
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 border border-black">
                                       <Field
                                         type="number"
                                         name={`quotation_items[${index}].total`}
                                         readOnly
-                                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                        className="bg-gray-50 border text-center border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                       />
                                     </td>
-                                    <td className="p-2">
+                                    <td className="p-2 ">
                                       {isEditable && (
                                         <button
                                           type="button"
                                           onClick={() =>
                                             arrayHelpers.remove(index)
                                           }
-                                          className="btn btn-danger"
+                                          // className="btn btn-danger uppercase"
+                                          className="flex items-center gap-1 bg-white border border-red-800  text-red-800 px-3 py-1.5 rounded-md text-xs shadow transition duration-200 uppercase"
                                         >
                                           Remove
                                         </button>
@@ -392,7 +432,7 @@ export default function View(props: QuotationId) {
                                     balance: "",
                                   })
                                 }
-                                className="btn btn-info mt-4"
+                                className="btn bg-white border border-black mt-1 mb-1 text-black uppercase"
                               >
                                 Add Row
                               </button>
@@ -459,13 +499,6 @@ export default function View(props: QuotationId) {
                             className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:text-white dark:border border-white "
                           />
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Grand Total */}
-                    <div className="flex justify-between py-2 border-t border-gray-300">
-                      <div className="ml-auto flex space-x-4 w-full">
-                        {/* Grand Total */}
                         <div className="flex flex-col w-1/4">
                           <label className="font-semibold">Grand Total</label>
                           <input
@@ -484,30 +517,53 @@ export default function View(props: QuotationId) {
                       </div>
                     </div>
 
-                    {/* Notes & Assumptions */}
-                    <div className="mt-6">
-                      <h4 className="font-semibold">Notes & Assumptions</h4>
-                      <Field
-                        as="textarea"
-                        name="notes_assumptions"
-                        disabled={!isEditable}
-                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
-                        placeholder="Enter any notes or assumptions regarding this quotation"
-                      />
+                    {/* Grand Total */}
+                    <div className="flex justify-between py-2 border-t border-gray-300">
+                      <div className="ml-auto flex space-x-4 w-full">
+                        {/* Grand Total */}
+                        {/* <div className="flex flex-col w-1/4">
+                          <label className="font-semibold">Grand Total</label>
+                          <input
+                            type="number"
+                            value={(() => {
+                              const discountAmount =
+                                totalExpenses * (values.discount / 100) || 0;
+                              const vatAmount =
+                                totalExpenses * (values.vat / 100) || 0;
+                              return totalExpenses - discountAmount + vatAmount;
+                            })()}
+                            readOnly
+                            className="bg-gray-200 p-2 rounded-md w-full dark:bg-gray-dark dark:text-white dark:border border-white"
+                          />
+                        </div> */}
+                      </div>
                     </div>
 
-                    {/* Terms & Conditions */}
-                    <div className="mt-6">
-                      <h4 className="font-semibold">Terms & Conditions</h4>
-                      <Field
-                        as="textarea"
-                        name="terms_conditions"
-                        disabled={!isEditable}
-                        className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
-                        placeholder="Enter terms and conditions for this quotation"
-                      />
-                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                      {/* Notes & Assumptions */}
+                      <div className="mt-1">
+                        <h4 className="font-semibold">Notes & Assumptions</h4>
+                        <Field
+                          as="textarea"
+                          name="notes_assumptions"
+                          disabled={!isEditable}
+                          className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
+                          placeholder="Enter any notes or assumptions regarding this quotation"
+                        />
+                      </div>
 
+                      {/* Terms & Conditions */}
+                      <div className="mt-1">
+                        <h4 className="font-semibold">Terms & Conditions</h4>
+                        <Field
+                          as="textarea"
+                          name="terms_conditions"
+                          disabled={!isEditable}
+                          className="bg-gray-50 border border-gray-300 dark:bg-gray-dark dark:text-white text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mt-2"
+                          placeholder="Enter terms and conditions for this quotation"
+                        />
+                      </div>
+                    </div>
                     {/* Submit and Cancel Buttons */}
                     <div className="modal-action">
                       <button type="submit" className="btn">

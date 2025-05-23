@@ -26,10 +26,10 @@ export default function AddItem() {
     <>
       <div className="flex justify-end mb-4">
         <button
-          className="btn btn-info"
+          className="btn bg-white border border-black text-black uppercase"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaCirclePlus className="w-6 h-6 btn-info" />
+          {/* <FaCirclePlus className="w-6 h-6 btn-info" /> */}
           Add item
         </button>
       </div>

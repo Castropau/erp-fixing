@@ -16,8 +16,3 @@ export async function deleteLocation(id: number): Promise<void> {
   if (!response.ok) {
     throw new Error("Failed to delete the item");
   }
-}
-
-
-
-

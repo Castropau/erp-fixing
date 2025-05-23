@@ -23,6 +23,7 @@ import { fetchItemDataById } from "@/api/product_master_list/fetchItemId";
 import { updateView, UpdateView } from "@/api/product_master_list/updateItem";
 import { fetchVendorList } from "@/api/product_master_list/fetchVendor";
 import { CiEdit } from "react-icons/ci";
+import { fetchCategory } from "@/api/delivery_receipt/fetchCategory";
 interface ProductId {
   id: number;
 }
@@ -30,6 +31,9 @@ export default function EditProduct(props: ProductId) {
   const { id } = props;
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const queryClient = useQueryClient();
+  const [searchCategory, setSearchCategory] = useState("");
+  const [isCategoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+
   const {
     data: ItemData,
     isLoading: isUserLoading,
@@ -66,7 +70,12 @@ export default function EditProduct(props: ProductId) {
     queryFn: fetchRoleList,
   });
 
-  if (DisLoading) return <div>Loading...</div>;
+  const { data: CategoryData } = useQuery({
+    queryKey: ["category"],
+    queryFn: fetchCategory, // Assume fetchDepartmentsList is an API call to fetch departments (projects)
+  });
+
+  // if (DisLoading) return <div>Loading...</div>;
   if (Derror instanceof Error)
     return <div>An error has occurred: {Derror.message}</div>;
   // if (isUserLoading) return <div>Loading item data...</div>;
@@ -89,10 +98,9 @@ export default function EditProduct(props: ProductId) {
       <div className="flex justify-end">
         <button
           onClick={() => setShowRegisterModal(true)}
-          className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition"
+          className="flex items-center gap-1 px-3 py-1.5 uppercase text-xs font-medium text-blue-800 bg-white rounded-md border border-blue-800 transition"
         >
-          <CiEdit className="w-4 h-4" />
-          Edit
+          view
         </button>
       </div>
 
@@ -101,7 +109,7 @@ export default function EditProduct(props: ProductId) {
         {showRegisterModal && (
           <dialog open className="modal mt-15 backdrop-blur-sm">
             <div className="modal-box w-11/12 max-w-7xl max-h-[80vh] overflow-y-auto dark:bg-gray-dark">
-              <h3 className="font-bold text-lg">Edit</h3>
+              {/* <h3 className="font-bold text-lg uppercase">Edit</h3> */}
               <Formik
                 enableReinitialize
                 initialValues={{
@@ -136,9 +144,11 @@ export default function EditProduct(props: ProductId) {
                 }}
               >
                 {({ values }) => (
-                  <Form className="py-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-start">
-                      <div className="grid grid-cols-2 gap-6">
+                  <Form className="py-1">
+                    {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 text-start">
+                      <div className="grid grid-cols-2 gap-1 uppercase "> */}
+                    <div className="grid grid-cols-1 lg:grid-cols-1">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-1 uppercase">
                         {[
                           {
                             type: "text",
@@ -158,12 +168,23 @@ export default function EditProduct(props: ProductId) {
                             placeholder: "Enter model",
                           },
                           {
-                            type: "text",
+                            type: "select",
                             name: "category",
                             label: "Category",
                             placeholder: "Enter category",
-                            datalistId: "category-list",
-                            options: ["Category A", "Category B", "Category C"],
+                            // datalistId: "category-list",
+                            // options: ["Category A", "Category B", "Category C"],
+                            options:
+                              CategoryData?.map((user) => ({
+                                value: user.id.toString(),
+                                label: user.category,
+                              })) || [],
+                          },
+                          {
+                            type: "text",
+                            name: "vat_percentage",
+                            label: "VAT (%)",
+                            placeholder: "Enter VAT percentage",
                           },
                           {
                             type: "text",
@@ -183,19 +204,19 @@ export default function EditProduct(props: ProductId) {
                             label: "Unit Price",
                             placeholder: "Enter unit price",
                           },
-                          {
-                            type: "text",
-                            name: "vat_percentage",
-                            label: "VAT (%)",
-                            placeholder: "Enter VAT percentage",
-                          },
+                          // {
+                          //   type: "text",
+                          //   name: "vat_percentage",
+                          //   label: "VAT (%)",
+                          //   placeholder: "Enter VAT percentage",
+                          // },
                         ].map((item) => {
                           if (item.name === "vendor") {
                             return (
-                              <div key={item.name} className="mb-4">
+                              <div key={item.name} className="mb-1">
                                 <label
                                   htmlFor={item.name}
-                                  className="block text-sm font-medium "
+                                  className="block text-sm font-bold "
                                 >
                                   {item.label}
                                 </label>
@@ -203,7 +224,7 @@ export default function EditProduct(props: ProductId) {
                                   as="select"
                                   id={item.name}
                                   name={item.name}
-                                  className="w-full p-2 border rounded-md"
+                                  className="w-full p-2 border rounded-md text-center"
                                 >
                                   <option value="">Select a vendor</option>
                                   {vendorList?.map((vendor) => (
@@ -218,12 +239,40 @@ export default function EditProduct(props: ProductId) {
                               </div>
                             );
                           }
+                          if (item.name === "category") {
+                            return (
+                              <div key={item.name} className="mb-1">
+                                <label
+                                  htmlFor={item.name}
+                                  className="block text-sm font-bold "
+                                >
+                                  {item.label}
+                                </label>
+                                <Field
+                                  as="select"
+                                  id={item.name}
+                                  name={item.name}
+                                  className="w-full p-2 border rounded-md text-center"
+                                >
+                                  <option value="">Select a vendor</option>
+                                  {CategoryData?.map((vendor) => (
+                                    <option
+                                      key={vendor.id}
+                                      value={vendor.category}
+                                    >
+                                      {vendor.category}
+                                    </option>
+                                  ))}
+                                </Field>
+                              </div>
+                            );
+                          }
 
                           return (
-                            <div key={item.name} className="mb-4">
+                            <div key={item.name} className="mb-1">
                               <label
                                 htmlFor={item.name}
-                                className="block text-sm font-medium "
+                                className="block text-sm font-bold "
                               >
                                 {item.label}
                               </label>
@@ -231,7 +280,7 @@ export default function EditProduct(props: ProductId) {
                                 type={item.type}
                                 id={item.name}
                                 name={item.name}
-                                className="w-full p-2 border rounded-md"
+                                className="w-full p-2 border rounded-md text-center"
                                 placeholder={item.placeholder}
                                 list={item.datalistId}
                               />
@@ -247,7 +296,7 @@ export default function EditProduct(props: ProductId) {
                         })}
 
                         {/* ✅ VAT Checkbox */}
-                        <div className="mb-4 flex items-center gap-2">
+                        <div className="mb-1 flex items-center gap-2">
                           <Field name="vat_exempt">
                             {({ field, form }) => (
                               <input
@@ -275,7 +324,7 @@ export default function EditProduct(props: ProductId) {
                       </div>
 
                       {/* Right Column - Table */}
-                      <div className="lg:ml-4">
+                      {/* <div className="lg:ml-4">
                         <div className="space-y-4">
                           <h4 className="font-bold">Table</h4>
                           <table className="table-auto w-full border-collapse border border-gray-200">
@@ -301,13 +350,15 @@ export default function EditProduct(props: ProductId) {
                             </tbody>
                           </table>
                         </div>
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* Form Fields */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* Left Column - 2 inputs in one line */}
-                      <div className="grid grid-cols-1 gap-6">
+                    {/* <div className="grid grid-cols-1 lg:grid-cols-2  gap-6">
+                      <div className="grid grid-cols-1 gap-6 "> */}
+                    <div className="grid grid-cols-1 gap-1">
+                      {/* Full-width Description Textarea */}
+                      <div className="w-full">
                         {[
                           {
                             type: "textarea",
@@ -320,7 +371,7 @@ export default function EditProduct(props: ProductId) {
                           <div key={item.name} className="mb-4">
                             <label
                               htmlFor={item.name}
-                              className="block text-sm font-medium "
+                              className="block text-sm font-bold uppercase "
                             >
                               {item.label}
                             </label>
@@ -336,7 +387,29 @@ export default function EditProduct(props: ProductId) {
                         ))}
                       </div>
                     </div>
-
+                    <div className="lg:ml-4">
+                      <div className="space-y-4">
+                        {/* <h4 className="font-bold">Table</h4> */}
+                        <table className="table-zebra w-full border-collapse border border-black">
+                          <thead>
+                            <tr className="border border-black bg-gray-200">
+                              <th className=" px-4 py-2">Created By</th>
+                              <th className="-300 px-4 py-2">Date Created</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className=" px-4 py-2">
+                                {ItemData?.created_by || "N/A"}
+                              </td>
+                              <td className=" px-4 py-2">
+                                {ItemData?.date_created || "N/A"}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                     <div className="modal-action">
                       <button type="submit" className="btn">
                         Update

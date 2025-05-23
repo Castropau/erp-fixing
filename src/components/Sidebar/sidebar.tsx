@@ -149,11 +149,12 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed top-19 left-0 z-40 h-screen transition-all duration-300 bg-[#800000] text-white overflow-y-auto border-r border-black dark:bg-gray-900 ${
+      className={`fixed top-19 left-0 z-40 h-screen transition-all duration-300 bg-[#800000] text-white overflow-scroll no-scrollbar border-r border-black dark:bg-gray-900 ${
         isCollapsed ? "w-16" : "w-64"
       } p-4`}
     >
-      <ul className="text-sm font-medium space-y-2">
+      <ul className="text-sm font-medium space-y-2 overflow-scroll no-scrollbar max-h-[calc(97vh-80px)]">
+        {/* <ul className="text-sm font-medium space-y-2 overflow-y-auto max-h-[calc(100vh-80px)] pr-2"> */}
         {navSections.map((section, sectionIndex) => (
           <li key={section.title ?? `section-${sectionIndex}`}>
             {section.title && !isCollapsed && (
@@ -206,9 +207,9 @@ const Sidebar = () => {
                     </>
                   ) : (
                     <Link
-                      href={item.path}
+                      href={item.path!}
                       className={`flex items-center p-2 rounded-lg ${
-                        isActive(item.path)
+                        isActive(item.path!)
                           ? "bg-white text-[#800000] font-semibold"
                           : "text-white hover:bg-red-600"
                       }`}

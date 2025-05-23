@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FaCirclePlus } from "react-icons/fa6";
 import { Formik, Field, Form, FieldArray } from "formik";
-import { registerCheque } from "@/api/cheque-request/CreateCheque";
+import { AddCheque, registerCheque } from "@/api/cheque-request/CreateCheque";
 import { fetchUserLists } from "@/api/cash-request/fetchUsers";
 import {
   fetchCashRequest,
@@ -21,6 +21,7 @@ export default function AddChequeRequest() {
 
   const { mutate: registerChequeRequest } = useMutation({
     mutationFn: registerCheque,
+    // mutationFn: (data: AddCheque) => registerCheque(data),
     onSuccess: () => {
       console.log("Cheque successfully registered");
       queryClient.invalidateQueries({ queryKey: ["cheque"] });
@@ -116,10 +117,10 @@ export default function AddChequeRequest() {
     <>
       <div className="flex justify-end">
         <button
-          className="btn btn-info"
+          className="btn bg-white uppercase text-black border border-black"
           onClick={() => setShowRegisterModal(true)}
         >
-          <FaCirclePlus className="h-5 btn-info" />
+          {/* <FaCirclePlus className="h-5 btn-info" /> */}
           Add Cheque Request
         </button>
       </div>
@@ -127,7 +128,7 @@ export default function AddChequeRequest() {
       {showRegisterModal && (
         <dialog open className="modal mt-15 backdrop-blur-sm">
           <div className="modal-box w-11/12 max-w-7xl max-h-[80vh] overflow-y-auto dark:bg-gray-dark">
-            <h3 className="font-bold text-lg dark:text-white">
+            <h3 className="font-bold text-lg dark:text-white text-center uppercase">
               Create New Cash Request
             </h3>
 
@@ -146,110 +147,116 @@ export default function AddChequeRequest() {
               onSubmit={handleSubmit}
             >
               {({ values, setFieldValue }) => (
-                <Form className="py-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Form Fields */}
-                    {[
-                      {
-                        name: "serial_no",
-                        type: "select",
-                        label: "Set Serial #",
-                      }, // Change type to select here
-                      { name: "date_requested", type: "date", label: "Date" },
-                      {
-                        name: "name_of_organization",
-                        type: "text",
-                        label: "Name of Organization",
-                      },
-                      { name: "cheque_no", type: "text", label: "cheque_no" },
-                      { name: "payable_to", type: "text", label: "Payable To" },
-                      { name: "address", type: "text", label: "Address" },
-                      { name: "purpose", type: "text", label: "Purpose" },
-                      {
-                        name: "requested_by",
-                        type: "select",
-                        label: "Requested By",
-                        options:
-                          usersList?.map((user) => ({
-                            value: user.id,
-                            label: user.full_name,
-                          })) || [],
-                      },
-                    ].map((item) => (
-                      <div
-                        key={item.name}
-                        className="mb-4 col-span-2 dark:text-white"
-                      >
-                        <label
-                          htmlFor={item.name}
-                          className="block text-sm font-medium text-gray-700 dark:text-white dark:bg-gray-dark"
-                        >
-                          {item.label}
-                        </label>
-
-                        {item.type === "select" ? (
-                          <Field
-                            as="select"
-                            id={item.name}
-                            name={item.name}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 dark:text-white dark:bg-gray-800 dark:border-gray-700 dark:placeholder:text-gray-300"
+                <Form className="">
+                  {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 uppercase"> */}
+                  <div className="flex flex-col gap-1 uppercase">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-1">
+                      {/* Form Fields */}
+                      {[
+                        {
+                          name: "serial_no",
+                          type: "select",
+                          label: "Set Serial #",
+                        }, // Change type to select here
+                        { name: "date_requested", type: "date", label: "Date" },
+                        {
+                          name: "name_of_organization",
+                          type: "text",
+                          label: "Name of Organization",
+                        },
+                        { name: "cheque_no", type: "text", label: "cheque no" },
+                        {
+                          name: "payable_to",
+                          type: "text",
+                          label: "Payable To",
+                        },
+                        { name: "address", type: "text", label: "Address" },
+                        { name: "purpose", type: "text", label: "Purpose" },
+                        {
+                          name: "requested_by",
+                          type: "select",
+                          label: "Requested By",
+                          options:
+                            usersList?.map((user) => ({
+                              value: user.id,
+                              label: user.full_name,
+                            })) || [],
+                        },
+                      ].map((item) => (
+                        <div key={item.name} className=" dark:text-white">
+                          <label
+                            htmlFor={item.name}
+                            className="block text-sm font-bold text-gray-700 dark:text-white dark:bg-gray-dark"
                           >
-                            <option value="">Select {item.label}</option>
-                            {item.name === "serial_no"
-                              ? values.cheque_requisition_items?.map(
-                                  (record: {
-                                    id: number;
-                                    serial_no: number;
-                                  }) => (
-                                    <option key={record.id} value={record.id}>
-                                      {record.serial_no}
-                                    </option>
+                            {item.label}
+                          </label>
+
+                          {item.type === "select" ? (
+                            <Field
+                              as="select"
+                              id={item.name}
+                              name={item.name}
+                              className=" block w-full border border-gray-300 rounded-md shadow-sm p-2 dark:text-white dark:bg-gray-800 dark:border-gray-700 dark:placeholder:text-gray-300"
+                            >
+                              <option value="">Select {item.label}</option>
+                              {item.name === "serial_no"
+                                ? values.cheque_requisition_items?.map(
+                                    (record: {
+                                      id: number;
+                                      serial_no: number;
+                                    }) => (
+                                      <option key={record.id} value={record.id}>
+                                        {record.serial_no}
+                                      </option>
+                                    )
                                   )
-                                )
-                              : item.options?.map((option) => (
-                                  <option
-                                    key={option.value}
-                                    value={option.value}
-                                  >
-                                    {option.label}
-                                  </option>
-                                ))}
-                          </Field>
-                        ) : item.type === "text" || item.type === "date" ? (
-                          <Field
-                            type={item.type}
-                            id={item.name}
-                            name={item.name}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                          />
-                        ) : null}
-                      </div>
-                    ))}
+                                : item.options?.map((option) => (
+                                    <option
+                                      key={option.value}
+                                      value={option.value}
+                                    >
+                                      {option.label}
+                                    </option>
+                                  ))}
+                            </Field>
+                          ) : item.type === "text" || item.type === "date" ? (
+                            <Field
+                              type={item.type}
+                              id={item.name}
+                              name={item.name}
+                              className=" block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                            />
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
 
                     <div className="col-span-2">
-                      <h2 className="font-bold text-lg mb-4 dark:bg-gray-dark dark:text-white">
+                      {/* <h2 className="font-bold text-lg dark:bg-gray-dark dark:text-white">
                         Items
-                      </h2>
+                      </h2> */}
                       <FieldArray name="cheque_requisition_items">
                         {({ push, remove }) => (
                           <div>
-                            <div className="bg-white p-4 rounded-lg shadow-md mt-6 dark:bg-gray-dark">
-                              <table className="min-w-full table-auto border-collapse">
-                                <thead>
+                            <div className="bg-white p-4 rounded-lg shadow-md mt-1 dark:bg-gray-dark">
+                              <table className="min-w-full table-zebra border-collapse border">
+                                <thead className="border bg-gray-200">
                                   <tr className="text-blue-500">
-                                    <th className="p-2 text-left">Serial No</th>
-                                    <th className="p-2 text-left">
+                                    <th className="p-2 text-center">
+                                      Serial No
+                                    </th>
+                                    <th className="p-2 text-center">
                                       Date of Purchase
                                     </th>
-                                    <th className="p-2 text-left">
+                                    <th className="p-2 text-center">
                                       Description
                                     </th>
-                                    <th className="p-2 text-left">Amount</th>
-                                    <th className="p-2 text-left">
+                                    <th className="p-2 text-center">Amount</th>
+                                    <th className="p-2 text-center">
                                       Cheque Number
                                     </th>
-                                    <th className="p-2 text-left">Remark</th>
-                                    <th className="p-2 text-left">Action</th>
+                                    <th className="p-2 text-center">Remark</th>
+                                    <th className="p-2 text-center">Action</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -306,7 +313,8 @@ export default function AddChequeRequest() {
                                             <button
                                               type="button"
                                               onClick={() => remove(index)} // Remove the row from Formik state
-                                              className="text-red-500 hover:text-red-700"
+                                              // className="text-red-500 hover:text-red-700"
+                                              className="flex items-center gap-1 bg-white  text-red-800 border border-red-800 px-3 py-1.5 rounded-md text-xs shadow transition duration-200 uppercase"
                                             >
                                               Remove
                                             </button>
@@ -329,7 +337,7 @@ export default function AddChequeRequest() {
 
                               {/* Cash Record Selection Dropdown */}
                               <select
-                                className="bg-gray-50 border border-gray-300 rounded-lg block w-full p-2.5 dark:bg-gray-dark dark:text-white"
+                                className="bg-gray-50 border border-gray-300 rounded-lg block w-full p-2.5 dark:bg-gray-dark dark:text-white mt-4"
                                 onChange={(e) => {
                                   const parsedValue: {
                                     id: number;
@@ -382,6 +390,7 @@ export default function AddChequeRequest() {
                       </FieldArray>
                     </div>
                   </div>
+
                   <div className="mt-4 flex justify-between ">
                     {/* Only show the Select Cash Record dropdown if in editing mode */}
                     {isEditing && (

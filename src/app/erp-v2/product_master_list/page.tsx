@@ -21,7 +21,7 @@ export default function Page() {
     queryFn: fetchRoleData,
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  // if (isLoading) return <div>Loading...</div>;
 
   if (error instanceof Error)
     return <div>An error has occurred: {error.message}</div>;
@@ -36,7 +36,7 @@ export default function Page() {
   const usersCount = uniqueUsers.size;
 
   return (
-    <div className="p-4 sm:ml-64">
+    <div className="p-4">
       <ProductMasterList />
     </div>
   );

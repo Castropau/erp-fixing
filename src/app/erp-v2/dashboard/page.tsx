@@ -11,6 +11,7 @@ import UserList from "./_components/Table/UserList";
 import DashboardCard from "./_components/Card/card";
 import { FaBox, FaBullhorn, FaUsers } from "react-icons/fa6";
 import { FaShoppingCart } from "react-icons/fa";
+import StatisticsChart from "./_components/Chart/StatisticsChart";
 
 export default function User() {
   const { isLoading, error, data } = useQuery({
@@ -42,11 +43,11 @@ export default function User() {
   const usersCount = uniqueUsers.size;
 
   return (
-    <div className="p-6 sm:ml-64 bg-gray-100 min-h-screen dark:bg-gray-dark">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6 dark:text-white">
+    <div className="p-4   min-h-screen dark:bg-gray-dark">
+      <h1 className="text-3xl font-bold text-gray-900 mb-3 dark:text-white">
         Dashboard
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-4">
         {/* Dashboard Cards */}
         <DashboardCard
           title={`Total of ${usersCount} Users`}
@@ -88,7 +89,7 @@ export default function User() {
       </div>
       {/* Placeholder for additional content */}
       <div className="overflow-x-auto">{/* <CreateUser /> */}</div>
-      {/* <UserList /> */}
+      <StatisticsChart />
     </div>
   );
 }

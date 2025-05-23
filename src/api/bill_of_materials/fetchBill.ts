@@ -1,8 +1,7 @@
 /** server actions */
 import { getCookies } from "@/server/getToken";
 
-interface Bom {
-  id: number; // id as an integer
+export interface Boms {
   bom_no: string; // full_name as a string
   project_name: string; // department as a string
   role: string;
@@ -12,9 +11,11 @@ interface Bom {
   date_created: string;
   created_by: string;
   status: boolean;
+  date: string;
+  id: number;
 }
 
-export async function fetchBomList(): Promise<Bom[]> {
+export async function fetchBomList(): Promise<Boms[]> {
   const token = await getCookies("token");
   const response = await fetch("http://192.168.0.249:8001/api/v1/boms/", {
     headers: {

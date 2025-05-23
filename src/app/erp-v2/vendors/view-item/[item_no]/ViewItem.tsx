@@ -36,7 +36,7 @@ function ViewItem() {
   // const params = useParams();
   // const id = Number(params?.id);
   const params = useParams();
-  const id = Number(params?.id);
+  const item_no = Number(params?.item_no);
 
   const [showEditModal, setShowEditModal] = useState(false);
 
@@ -86,14 +86,14 @@ function ViewItem() {
   });
   const {
     data: VendorData,
-    isLoading,
+    isLoading: isLvendor,
     isError,
     error,
   } = useQuery({
-    queryKey: ["vendor", id],
-    queryFn: () => fetchVendorDataByIds(id),
+    queryKey: ["vendor", item_no],
+    queryFn: () => fetchVendorDataByIds(item_no),
 
-    enabled: !!id,
+    enabled: !!item_no,
   });
   useEffect(() => {
     if (VendorData) {
@@ -193,53 +193,64 @@ function ViewItem() {
       queryClient.invalidateQueries({ queryKey: ["units"] });
     },
   });
+  if (isLvendor) {
+    return (
+      <div className="p-4 flex justify-center items-center min-h-screen">
+        <div className="flex flex-col items-center space-y-4">
+          {/* Loading Spinner */}
+          <div className="dark:border-gray-200 dark:border-t-white  w-16 h-16 border-4 border-t-4 border-gray-800 border-dashed rounded-full animate-spin"></div>
+
+          <span className="text-lg text-gray-700 dark:text-white">
+            Please wait...
+          </span>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <div className="ml-auto">
         <Link href="/erp-v2/vendors">
-          <button className="btn btn-info">
-            <IoMdArrowBack />
-            Back to Cash Request
+          <button className="btn btn-info text-white uppercase">
+            {/* <IoMdArrowBack /> */}
+            Back to vendor list
           </button>
         </Link>
       </div>
       <div className="grid grid-cols-2 gap-6">
         {/* First Column: Personal Information Input */}
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold flex justify-between items-center">
-            Personal Information
-            {/* Button to toggle between Edit and Update */}
-            <div className="flex space-x-2">
-              {!isEditable ? (
+          {/* Button to toggle between Edit and Update */}
+          <div className="flex space-x-2 justify-end">
+            {!isEditable ? (
+              <button
+                onClick={handleEditToggle}
+                className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 uppercase"
+              >
+                Edit
+              </button>
+            ) : (
+              <>
                 <button
-                  onClick={handleEditToggle}
-                  className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+                  onClick={handleCancel}
+                  className="px-4 py-2 text-white bg-gray-500 rounded-lg hover:bg-gray-600"
                 >
-                  Edit
+                  Cancel
                 </button>
-              ) : (
-                <>
-                  <button
-                    onClick={handleCancel}
-                    className="px-4 py-2 text-white bg-gray-500 rounded-lg hover:bg-gray-600"
-                  >
-                    Cancel
-                  </button>
-                  {/* <button
+                {/* <button
                     onClick={handleEditToggle} // This would be where you handle the update logic
                     className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600"
                   >
                     Update
                   </button> */}
-                </>
-              )}
-            </div>
-          </h2>
+              </>
+            )}
+          </div>
 
           {/* Profile Image */}
           <div className="flex flex-col items-center mb-4">
             <img
-              src="https://via.placeholder.com/100" // Replace with the actual profile image URL
+              src="/images/logo.png" // Replace with the actual profile image URL
               alt="Profile"
               className="w-24 h-24 rounded-full border-2 border-gray-300"
             />
@@ -269,7 +280,7 @@ function ViewItem() {
               updateVendor(values); // Handle form submission by calling the mutation
             }}
           >
-            <Form className="space-y-6 md:space-y-8">
+            <Form className="space-y-1 md:space-y-1 uppercase">
               <div style={{ color: "red" }}>
                 {/* Display error messages here if needed */}
               </div>
@@ -411,18 +422,22 @@ function ViewItem() {
                   setCurrentPageUnits(1);
                 }}
               />
-              <table className="min-w-full table-auto border-collapse">
-                <thead>
-                  <tr className="text-blue-500">
-                    <th className="p-2 text-left">created by</th>
-                    <th className="p-2 text-left">Date created</th>
+              <table className="min-w-full table-zebra border-collapse">
+                <thead className="border border-black">
+                  <tr className="text-blue-500 uppercase bg-gray-200">
+                    <th className="p-2 text-center">created by</th>
+                    <th className="p-2 text-center">Date created</th>
                   </tr>
                 </thead>
                 <tbody>
                   {VendorData && (
-                    <tr key={VendorData.id} className="border-b">
-                      <td className="p-2">{VendorData.created_by}</td>
-                      <td className="p-2">{VendorData.date_created}</td>
+                    <tr key={VendorData.id} className=" border border-black">
+                      <td className="p-2 text-center">
+                        {VendorData.created_by}
+                      </td>
+                      <td className="p-2 text-center">
+                        {VendorData.date_created}
+                      </td>
                     </tr>
                   )}
                 </tbody>
