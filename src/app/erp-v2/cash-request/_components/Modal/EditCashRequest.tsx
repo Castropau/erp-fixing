@@ -93,28 +93,14 @@ export default function EditCashRequest(props: CashId) {
     queryFn: fetchUserLists,
   });
 
-  const printPdf = () => {
-    const printWindow = window.open("", "_blank");
-    printWindow?.document.write(`
-          <html>
-            <head>
-              <title>Print PDF</title>
-            </head>
-            <body>
-              <iframe src="/erp-v2/cash-request/Invoice" width="100%" height="100%"></iframe>
-              <script>
-                window.onload = function() {
-                
-                  window.onafterprint = function() {
-                    window.close();
-                  };
-                };
-              <\/script>
-            </body>
-          </html>
-        `);
-    printWindow?.document.close();
+  const openPdfWindow = () => {
+    // Open the new window with the `id` as query parameter
+    const newWindow = window.open(`/print-invoice/${id}`, "_blank");
+    if (newWindow) {
+      newWindow.focus();
+    }
   };
+
   const handleSubmit = (values: any) => {
     updatedUserCash(values); // Submit the form data when submitted
     console.log(values);
@@ -151,7 +137,7 @@ export default function EditCashRequest(props: CashId) {
             {/* <h3 className="font-bold text-lg">Detail</h3> */}
             <button
               className="ml-250 border border-black text-black uppercase bg-white px-2 py-2"
-              onClick={printPdf}
+              onClick={openPdfWindow}
             >
               print
             </button>

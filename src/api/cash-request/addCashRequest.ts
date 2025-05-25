@@ -104,7 +104,7 @@ export interface AddRequisitionCash{
 export async function registerCashRequest(cashData: AddRequisitionCash): Promise<any> {
   const token = await getCookies("token");
   const response = await fetch(
-    "http://192.168.0.249:8001/api/v1/requisitions/cash/",
+    "http://192.168.0.112:8000/api/v1/requisitions/cash/",
     {
       method: "POST",
       headers: {

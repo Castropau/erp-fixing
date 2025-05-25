@@ -14,7 +14,7 @@ export interface Items {
 export async function ChequeItems(): Promise<Items[]> {
     const token = await getCookies("token");
     const response = await fetch(
-      "http://192.168.0.249:8001/api/v1/requisitions/items",
+      "http://192.168.0.112:8000/api/v1/requisitions/items",
       {
         headers: {
           Authorization: `Bearer ${token?.value}`,

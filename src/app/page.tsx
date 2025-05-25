@@ -14,7 +14,7 @@ export default function Home() {
   const { mutate: login } = useMutation({
     mutationFn: (data: { username: string; password: string }) => {
       const config = {
-        url: `http://192.168.0.249:8001/api/v1/users/login/`,
+        url: `http://192.168.0.112:8000/api/v1/users/login/`,
         method: "POST",
         data: {
           username: data.username,

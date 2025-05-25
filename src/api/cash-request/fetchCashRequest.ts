@@ -13,7 +13,7 @@ export interface RequisitionCash {
 
 export async function fetchCashRequest(): Promise<RequisitionCash[]> {
   const token = await getCookies("token");
-  const response = await fetch("http://192.168.0.249:8001/api/v1/requisitions/cash/", {
+  const response = await fetch("http://192.168.0.112:8000/api/v1/requisitions/cash/", {
     headers: {
       Authorization: `Bearer ${token?.value}`,
     },
