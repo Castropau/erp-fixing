@@ -27,8 +27,30 @@ const IconWrapper = ({ children }: { children: React.ReactNode }) => (
     {children}
   </div>
 );
+type NavItemBase = {
+  name: string;
+  icon: React.ReactElement;
+};
 
-const navSections = [
+type NavItemWithPath = NavItemBase & {
+  path: string;
+  subItems?: undefined;
+};
+
+type NavItemWithSubItems = NavItemBase & {
+  subItems: { name: string; path: string }[];
+  path?: undefined;
+};
+
+type NavItem = NavItemWithPath | NavItemWithSubItems;
+
+type NavSection = {
+  title?: string;
+  items: NavItem[];
+};
+
+
+const navSections: NavSection[] = [
   {
     items: [{ name: "Dashboard", icon: <MdDashboard />, path: "/erp-v2/dashboard" }],
   },
